@@ -1,0 +1,4 @@
+---
+description: a short example-slash-test of draughtsman
+---
+YAML (either .yml or in a .txt container) is an interesting format, because it allows us to specify variables in the first document, and freeform content after that, describing what exactly the document is about.

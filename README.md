@@ -11,7 +11,9 @@ to your template.
 This application is solely intended to facilitate front-end prototyping. Once you or your
 team moves on from sketching, forget about Draughtsman and use a proper dev environment.
 
-# Installation
+It's only about a 100 lines of code. Take a look and adapt to your tastes.
+
+## Installation
 
 Draughtsman can work as a web server or as a reverse proxy. To use Draughtsman as a rudimentary
 web server (bypassing e.g. Apache entirely), simply start up the app by opening up a terminal and 
@@ -47,3 +49,8 @@ For NGINX, try something like this:
 For additional convenience, you may want to deamonize the application and run it after 
 login or startup just like your web server. Use whatever method or tool you prefer; 
 upstart is a good bet if you're on Ubuntu.
+
+## An example
+
+You can see an example in action by cd'ing to wherever you have draughtsman installed and
+running `cake build; bin/draughtsman ./test/example`.

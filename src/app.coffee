@@ -5,7 +5,7 @@ _ = require 'underscore'
 jade = require 'jade'
 coffee = require 'coffee-script'
 stylus = require 'stylus'
-#yaml = require 'yaml'
+yaml = require 'yaml'
 
 # App
 
@@ -18,9 +18,9 @@ YAML =
         # js-yaml doesn't split YAML documents like it should
         documents = str.split("---\n")
         if documents.length > 1
-            return yaml.parse documents[1]
+            return yaml.eval documents[1]
         else
-            return yaml.parse documents[0]
+            return yaml.eval documents[0]
 
 find_template_variables = (template) ->
     match = /^(.*\.)[a-z]{2,6}$/.exec template

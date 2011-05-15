@@ -1,14 +1,22 @@
 {
     "name": "draughtsman",
     "author": "Stijn Debrouwere",
-    "description": "Easy transparent compilation of templates and stylesheets for prototyping HTML interfaces.",
+    "description": "Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.",
     "version": "0.1",
     "main": "./lib/app.js",
+    "bin" : "./bin/draughtsman",
     "dependencies": {
         "coffee-script": "latest", 
-        "config": "latest", 
         "express": "latest", 
         "jade": "latest", 
-        "stylus": "latest"
+        "stylus": "latest",
+        "yaml": "latest",
+        "underscore": "latest",
+    },
+    "repository": {
+        "type": "git", 
+        "url": "git://github.com/stdbrouw/draughtsman.git"
     }
+    "licenses":
+        [{"type": "MIT", "url": "http://github.com/stdbrouw/draughtsman/raw/master/LICENSE"}]
 }
