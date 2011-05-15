@@ -1,0 +1,14 @@
+{
+    "name": "draughtsman",
+    "author": "Stijn Debrouwere",
+    "description": "Easy transparent compilation of templates and stylesheets for prototyping HTML interfaces.",
+    "version": "0.1",
+    "main": "./lib/app.js",
+    "dependencies": {
+        "coffee-script": "latest", 
+        "config": "latest", 
+        "express": "latest", 
+        "jade": "latest", 
+        "stylus": "latest"
+    }
+}
