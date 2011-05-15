@@ -13,26 +13,30 @@ app = module.exports = express.createServer()
 
 ROOT = process.argv[2]
 
-parse = 
-    txt: (str) ->
-    json: (str) ->
-    yaml: (str) ->
+YAML =
+    parse: (str) ->
+        # js-yaml doesn't split YAML documents like it should
+        documents = str.split("---\n")
+        if documents.length > 1
+            return yaml.parse documents[1]
+        else
+            return yaml.parse documents[0]
 
 find_template_variables = (template) ->
     match = /^(.*\.)[a-z]{2,6}$/.exec template
     base = match[1]
     related_files = [
-        base + 'txt'
-        base + 'yml'
-        base + 'json'
+        [base + 'txt', YAML.parse]
+        [base + 'yml',  YAML.parse]
+        [base + 'json', JSON.parse]
         ]
 
     variables = related_files    
-        .map (file) ->
-            file = ROOT + file
+        .map (descriptor) ->
+            [file, parser] = descriptor
             if path.existsSync file
                 str = fs.readFileSync file, 'utf-8'
-                return JSON.parse str
+                return parser str
             else
                 return {}
         .reduce (a, b) ->
@@ -40,34 +44,37 @@ find_template_variables = (template) ->
 
     return variables
 
+app.get '*', (req, res, next) ->
+    res.header 'Cache-Control', 'no-cache, must-revalidate'
+    next()
+
+app.get '*', (req, res, next) ->
+    file = ROOT + req.params[0]
+    path.exists file, (exists) ->
+        if exists
+            fs.readFile file, 'utf-8', (err, content) ->
+                req.file =
+                    path: file
+                    content: content
+                next()
+        else
+            res.send 404
+
 app.get /^(.*\.coffee)$/, (req, res) ->
-    file = req.params[0]
-    if path.existsSync ROOT + file
-        res.contentType 'application/javascript'
-        script = fs.readFileSync ROOT + file, 'utf-8'
-        res.send coffee.compile script
-    else
-        res.send 404
+    res.contentType 'application/javascript'
+    javascript = coffee.compile req.file.content
+    res.send javascript
 
 app.get /^(.*\.styl)$/, (req, res) ->
-    file = req.params[0]
-    if path.existsSync ROOT + file
-        style = fs.readFileSync ROOT + file, 'utf-8'
-        stylus(style).render (err, css) ->
-                if err
-                    res.send err
-                else
-                    res.contentType 'text/css'
-                    res.send css     
-    else
-        res.send 404       
-
-app.get /^(.*\.jade)$/, (req, res) ->
-    file = req.params[0]
-    res.contentType 'text/html'
-    vars = find_template_variables file
-    jade.renderFile ROOT + file, {locals: vars}, (err, html) ->
+    stylus(req.file.content).render (err, css) ->
         if err
             res.send err
         else
-            res.send html
+            res.contentType 'text/css'
+            res.send css          
+
+app.get /^(.*\.jade)$/, (req, res) ->
+    vars = find_template_variables req.file.path
+    html = jade.render req.file.content, {locals: vars}
+    res.contentType 'text/html'
+    res.send html
