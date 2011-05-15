@@ -1,4 +1,4 @@
 hello = (person) ->
-    "Hello #{person}"
+    alert "Hello #{person}"
 
 hello "Esteban"

@@ -1,0 +1,36 @@
+!!! 5
+html
+  head
+    style
+      body {
+        font-family: arial;
+        margin: 50px auto;
+        width: 550px;
+        border: 1px solid #ccc;
+        padding: 25px;
+      }
+
+      ul {
+        margin: 0;
+      }
+
+      li {
+        list-style-type: none;
+        margin-bottom: 15px;
+      }
+
+      a {
+        color: #194287;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: black;
+      }
+  body
+    h1 Directory listing
+    ul
+    - each file in files
+      li
+        a(href=file)= file

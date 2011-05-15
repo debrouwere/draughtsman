@@ -78,3 +78,13 @@ app.get /^(.*\.jade)$/, (req, res) ->
     html = jade.render req.file.content, {locals: vars}
     res.contentType 'text/html'
     res.send html
+
+app.get /^(.*)\//, (req, res) ->
+    options = 
+        locals: 
+            files: fs.readdirSync req.file.path
+
+    console.log options
+
+    jade.renderFile './src/listing.jade', options, (err, html) ->
+        res.send html
