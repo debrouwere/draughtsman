@@ -63,7 +63,8 @@ exports.listen = (port, relay_server) ->
             if destination?
                 proxy.proxyRequest req, res, {host: destination.hostname, port: destination.port}
             else
-                res.send 404
+                res.writeHead 404, {'Content-Type': 'text/plain'}
+                res.end('Not Found\n');
 
     # listen
     proxy_server.listen port
