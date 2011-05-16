@@ -11,14 +11,18 @@ to your template.
 This application is solely intended to facilitate front-end prototyping. Once you or your
 team moves on from sketching, forget about Draughtsman and use a proper dev environment.
 
-It's only about a 100 lines of code. Take a look and adapt to your tastes.
+It's only about a 200 lines of code. Take a look and adapt to your tastes.
 
 ## Installation
 
-Draughtsman can work as a web server or as a reverse proxy. To use Draughtsman as a rudimentary
-web server (bypassing e.g. Apache entirely), simply start up the app by opening up a terminal and 
-execute `draughtsman /my/basepath`. Surf to http://0.0.0.0:3400/ for a directory listing and take
-it from there.
+Draughtsman can work as a standalone web server, a proxy or a reverse proxy.
+
+To use Draughtsman as a rudimentary web server (bypassing e.g. Apache entirely), simply start up 
+the app by opening up a terminal and execute `draughtsman /my/basepath`. Surf to http://0.0.0.0:3400/ for a directory listing and take it from there.
+
+You can also use Draughtsman as a proxy: it'll process any file formats it knows about, 
+and forward any other requests, like for PHP files, to a proper web server of your choosing.
+To use Draughtsman as a proxy, ----------------
 
 To use Draughtsman as a reverse proxy, you'll need to configure your main web server. For Apache, 
 a configuration like this should work:
@@ -54,3 +58,5 @@ upstart is a good bet if you're on Ubuntu.
 
 You can see an example in action by cd'ing to wherever you have draughtsman installed and
 running `cake build; bin/draughtsman ./test/example`.
+
+## Adding handlers

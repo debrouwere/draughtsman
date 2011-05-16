@@ -2,14 +2,11 @@
 express = require 'express'
 fs = require 'fs'
 path = require 'path'
-_ = require 'underscore'
 http_proxy = require 'http-proxy'
 
-# processors
-jade = require 'jade'
-coffee = require 'coffee-script'
-stylus = require 'stylus'
-yaml = require 'yaml'
+here = (paths...) ->
+    paths = [__dirname].concat paths
+    path.join.apply this, paths
 
 # App
 
@@ -17,37 +14,6 @@ app = express.createServer()
 proxy = new http_proxy.HttpProxy()
 
 ROOT = process.argv[2]
-
-YAML =
-    parse: (str) ->
-        # js-yaml doesn't split YAML documents like it should
-        documents = str.split("---\n")
-        if documents.length > 1
-            return yaml.eval documents[1]
-        else
-            return yaml.eval documents[0]
-
-find_template_variables = (template) ->
-    match = /^(.*\.)[a-z]{2,6}$/.exec template
-    base = match[1]
-    related_files = [
-        [base + 'txt', YAML.parse]
-        [base + 'yml',  YAML.parse]
-        [base + 'json', JSON.parse]
-        ]
-
-    variables = related_files    
-        .map (descriptor) ->
-            [file, parser] = descriptor
-            if path.existsSync file
-                str = fs.readFileSync file, 'utf-8'
-                return parser str
-            else
-                return {}
-        .reduce (a, b) ->
-            _.extend a, b
-
-    return variables
 
 app.get '*', (req, res, next) ->
     res.header 'Cache-Control', 'no-cache, must-revalidate'
@@ -65,37 +31,26 @@ app.get '*', (req, res, next) ->
         else
             res.send 404
 
-app.get /^(.*\.coffee)$/, (req, res) ->
-    res.contentType 'application/javascript'
-    javascript = coffee.compile req.file.content
-    res.send javascript
+# this is where the magic happens
+for handler in fs.readdirSync here "handlers"
+    handler_path = here "handlers", handler.replace(".coffee", "")
+    require(handler_path)(app) 
 
-app.get /^(.*\.styl)$/, (req, res) ->
-    stylus(req.file.content).render (err, css) ->
-        if err
-            res.send err
-        else
-            res.contentType 'text/css'
-            res.send css          
-
-app.get /^(.*\.jade)$/, (req, res) ->
-    vars = find_template_variables req.file.path
-    html = jade.render req.file.content, {locals: vars}
-    res.contentType 'text/html'
-    res.send html
-
+# directory listing
 app.get /^(.*)\/$/, (req, res) ->
     options = 
         locals: 
             files: fs.readdirSync req.file.path
 
-    jade.renderFile './src/listing.jade', options, (err, html) ->
+    jade.renderFile here('listing.jade'), options, (err, html) ->
         res.send html
 
 exports.listen = (port, relay_server) ->
     app.listen port
     console.log """Draughtsman now listening on http://0.0.0.0:#{port} 
         and forwarding to #{relay_server}"""
+
+    # a relay server fallback for stuff we don't have handlers for
     if relay_server?
         app.get '*', (req, res) ->
             [host, port] = relay_server.split ":"
