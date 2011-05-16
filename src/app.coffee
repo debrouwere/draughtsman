@@ -1,7 +1,11 @@
+# utilities
 express = require 'express'
 fs = require 'fs'
 path = require 'path'
 _ = require 'underscore'
+http_proxy = require 'http-proxy'
+
+# processors
 jade = require 'jade'
 coffee = require 'coffee-script'
 stylus = require 'stylus'
@@ -9,7 +13,8 @@ yaml = require 'yaml'
 
 # App
 
-app = module.exports = express.createServer()
+app = express.createServer()
+proxy = new http_proxy.HttpProxy()
 
 ROOT = process.argv[2]
 
@@ -79,12 +84,19 @@ app.get /^(.*\.jade)$/, (req, res) ->
     res.contentType 'text/html'
     res.send html
 
-app.get /^(.*)\//, (req, res) ->
+app.get /^(.*)\/$/, (req, res) ->
     options = 
         locals: 
             files: fs.readdirSync req.file.path
 
-    console.log options
-
     jade.renderFile './src/listing.jade', options, (err, html) ->
         res.send html
+
+exports.listen = (port, relay_server) ->
+    app.listen port
+    console.log """Draughtsman now listening on http://0.0.0.0:#{port} 
+        and forwarding to #{relay_server}"""
+    if relay_server?
+        app.get '*', (req, res) ->
+            [host, port] = relay_server.split ":"
+            proxy.proxyRequest req, res, {host: host, port: port}

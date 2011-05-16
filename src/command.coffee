@@ -1,7 +1,9 @@
 fs = require 'fs'
+optimist = require 'optimist'
 draughtsman = require './app'
 
-# TODO: convert ./ and ../ based on CWD
+argv = require('optimist').argv
 
 exports.run = ->
-    draughtsman.listen 3400
+    port = argv.port or 3400
+    draughtsman.listen port, argv.relay
