@@ -1,6 +1,8 @@
-express = require 'express'
 fs = require 'fs'
 path = require 'path'
+http = require 'http'
+url = require 'url'
+express = require 'express'
 http_proxy = require 'http-proxy'
 jade = require 'jade'
 
@@ -11,6 +13,7 @@ here = (paths...) ->
 # App
 
 app = express.createServer()
+proxy = new http_proxy.HttpProxy()
 
 ROOT = process.argv[2]
 
@@ -44,18 +47,24 @@ app.get /^(.*)\/$/, (req, res) ->
     jade.renderFile here('listing.jade'), options, (err, html) ->
         res.send html
 
-proxy2 = require('./proxy')
-
 exports.listen = (port, relay_server) ->
-    app.listen port
-    console.log """Draughtsman now listening on http://0.0.0.0:#{port} 
-        and forwarding to #{relay_server}"""
-
-    # a relay server fallback for stuff we don't have handlers for
+    # init
+    port = parseInt port
     if relay_server?
-        app.all '*', (req, res) ->
-            proxy = new proxy2.Proxy relay_server
-            proxy.forward req, res
+        destination = url.parse relay_server
     else
-        app.all '*', (req, res) ->
-            res.send 404
+        destination = null
+
+    # proxy server
+    proxy_server = http.createServer (req, res) ->
+        if app.match.get(req.url).length > 2
+            proxy.proxyRequest req, res, {host: 'localhost', port: port+1}
+        else
+            if destination?
+                proxy.proxyRequest req, res, {host: destination.hostname, port: destination.port}
+            else
+                res.send 404
+
+    # listen
+    proxy_server.listen port
+    app.listen port+1
