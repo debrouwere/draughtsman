@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Enabled</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>Label</key>
+	<string>com.draughtsman</string>
+	<key>Program</key>
+	<string>/usr/local/lib/node_modules/draughtsman/bin/draughtsman</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>ServiceDescription</key>
+	<string>Draughtsman is a development-oriented web server and proxy. Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.</string>
+	<key>UserName</key>
+	<string>administrator</string>
+</dict>
+</plist>

@@ -1,7 +1,7 @@
 {
     "name": "draughtsman",
     "author": "Stijn Debrouwere",
-    "description": "Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.",
+    "description": "A development-oriented web server and proxy. Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.",
     "version": "0.1",
     "main": "./lib/app.js",
     "bin" : "./bin/draughtsman",
