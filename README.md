@@ -22,7 +22,7 @@ the app by opening up a terminal and execute `draughtsman /my/basepath`. Surf to
 
 You can also use Draughtsman as a proxy: it'll process any file formats it knows about, 
 and forward any other requests, like for PHP files, to a proper web server of your choosing.
-To use Draughtsman as a proxy, ----------------
+To use Draughtsman as a proxy, use the `--relay` argument, e.g. `draughtsman ./test/example --port 5000 --relay http://localhost:8888`.
 
 To use Draughtsman as a reverse proxy, you'll need to configure your main web server. For Apache, 
 a configuration like this should work:
@@ -50,6 +50,8 @@ For NGINX, try something like this:
         }
     }
 
+## Daemonize
+
 For additional convenience, you may want to deamonize the application and run it after 
 login or startup just like your web server. Use whatever method or tool you prefer; 
 upstart is a good bet if you're on Ubuntu.
@@ -60,3 +62,21 @@ You can see an example in action by cd'ing to wherever you have draughtsman inst
 running `cake build; bin/draughtsman ./test/example`.
 
 ## Adding handlers
+
+Draughtsman currently processes Jade templates, CoffeeScript and Stylus. You can however
+easily add your own handler to `src/handlers`. The code should export a factory that outputs
+an express.js controller, which looks something like this: 
+
+    stylus = require 'stylus'
+    
+    module.exports = (app) ->
+        app.get /^(.*\.styl)$/, (req, res) ->
+            stylus(req.file.content).render (err, css) ->
+                if err
+                    res.send err
+                else
+                    res.contentType 'text/css'
+                    res.send css
+
+Draughtsman automatically picks up any and all handlers in the `handlers` directory, though
+you'll need to run `cake build` on the app to recompile the code to include your handlers.
