@@ -63,9 +63,12 @@ running `cake build; bin/draughtsman ./test/example`.
 
 ## Adding handlers
 
-Draughtsman currently processes Jade templates, CoffeeScript and Stylus. You can however
+Draughtsman processes Jade templates, CoffeeScript and Stylus out of the box. You can however
 easily add your own handler to `src/handlers`. The code should export a factory that outputs
-an express.js controller, which looks something like this: 
+an express.js controller, written in either CoffeeScript (as in the examples below) or 
+JavaScript.
+
+A handler looks something like this: 
 
     stylus = require 'stylus'
     
@@ -78,5 +81,27 @@ an express.js controller, which looks something like this:
                     res.contentType 'text/css'
                     res.send css
 
+The requested file (in its plain/uncompiled state) will be available to you in `req.file.content`, 
+and the file path is accessible through `req.file.path`.
+
 Draughtsman automatically picks up any and all handlers in the `handlers` directory, though
 you'll need to run `cake build` on the app to recompile the code to include your handlers.
+
+Draughtsman runs in node.js, but handlers' processing doesn't need to happen in node.js itself;
+you can easily create simple handlers that spawn a child process. For example, here's an 
+alternative implementation of a CoffeeScript handler: 
+
+    exec = require('child_process').exec
+
+    module.exports = (app) ->
+        app.get /^(.*\.coffee)$/, (req, res) ->
+            exec 'coffee -cp #{req.file.path}', (error, stdout, stderr) ->
+                if error
+                    res.send error
+                else
+                    res.contentType 'application/javascript'
+                    res.send stdout
+
+Using `exec` is particularly useful for compilers that are intended to be used through the
+shell, such as for the SASS stylesheet preprocessor, or when you need to write your own precompiler, 
+for example a Python script that renders a file using the Jinja or Django template language.
