@@ -1,3 +1,4 @@
+_ = require 'underscore'
 fs = require 'fs'
 path = require 'path'
 http = require 'http'
@@ -39,10 +40,34 @@ for handler in fs.readdirSync here "handlers"
     require(handler_path)(app) 
 
 # directory listing
+get_files = (base) ->
+    files = fs.readdirSync base
+    files = files.map (file) ->
+        path = base + "/" + file
+        try
+            stat = fs.statSync(path)
+        catch error
+            return [null]
+        
+        if stat.isDirectory()
+            return get_files path
+        else
+            return [path]
+    return files
+
 app.get /^(.*)\/$/, (req, res) ->
+    listing = fs.readdirSync ROOT
+
+    # all files, for our search function
+    if require('optimist').argv['search-tree']?
+        files = require('findit').findSync ROOT
+    else
+        files = listing
+
     options = 
-        locals: 
-            files: fs.readdirSync req.file.path
+        locals:
+            listing: listing
+            files: JSON.stringify(files)
 
     jade.renderFile here('listing.jade'), options, (err, html) ->
         res.send html
@@ -69,3 +94,7 @@ exports.listen = (port, relay_server) ->
     # listen
     proxy_server.listen port
     app.listen port+1
+
+    console.log "Draughtsman proxy listening on port #{port}, server on #{port+1}"
+    if relay_server?
+        console.log "Relaying file handling for unknown file types to #{relay_server}"

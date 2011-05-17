@@ -12,6 +12,7 @@
         "stylus": "latest",
         "yaml": "latest",
         "underscore": "latest",
+        "findit": "latest"
     },
     "repository": {
         "type": "git", 

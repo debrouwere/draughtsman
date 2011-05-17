@@ -7,6 +7,7 @@ html
         margin: 50px auto;
         width: 550px;
         border: 1px solid #ccc;
+        border-top-width: 5px;
         padding: 25px;
       }
 
@@ -15,26 +16,70 @@ html
       }
 
       ul {
-        margin: 0;
+        margin-top: 25px;
+        padding-left: 0;
       }
 
       li {
         list-style-type: none;
+        padding-left: 15px;
         margin-bottom: 10px;
       }
 
       a {
-        color: #194287;
+        color: #00609d;
         text-decoration: none;
       }
 
       a:hover {
-        color: black;
+        color: #2e3a46;
       }
+
+    script var files = !{files};
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js')
+    script
+        function a (link) {
+            return '<a href="' + link + '">' + link + '</a>'
+        }
+    
+        function toggle_search_form(state) {
+            if (state) {
+                $("ul#listing").hide();
+                $("ul#search").show();
+            } else {
+                $("ul#listing").show();
+                $("ul#search").hide();
+            }
+        }
+    
+        function display_search_results() {
+            var query = $(this).val();
+            if (query.length === 0) {
+                toggle_search_form(false);
+                return;
+            } else {
+                toggle_search_form(true);
+            }
+            
+            var matches = files.filter(function(file){
+                return file.indexOf(query) != -1;
+            });
+            $("ul#search").empty();
+            matches.forEach(function(match){
+                $("<li>" + a(match) + "</li>").appendTo("ul#search");
+            });
+        }
+    
+        $(document).ready(function(){
+            $("ul#search").hide();
+            $("input").bind('keyup click', display_search_results);
+        });
+      
   body
     h1 Directory listing for /
-    input(type='search', placeholder='autocompleted-search')    
-    ul
-    - each file in files
-      li
-        a(href=file)= file
+    input(type='search', placeholder='search for a file or filetype')    
+    ul#listing
+      - each file in listing
+        li
+          a(href=file)= file
+    ul#search
