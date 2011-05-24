@@ -33,7 +33,8 @@ function configure(answers) {
     var web_root = answers[1] || default_web_root;
     if (run_on_startup) {
         if (os == 'Darwin' || os == 'Linux') {
-            fs.symlinkSync(__dirname + init_script, init_dir + init_script);
+            var script = fs.readFileSync(__dirname + init_script, 'utf8').replace('{ROOT_DIR}', web_root);
+            fs.writeFileSync(init_dir + init_script, script, 'utf8');
             stdout.write("Next time you reboot, Draughtsman will be at your service at port 3400 on your localhost, processing files in " + web_root + "\n");
         } else {
             stdout.write("OS not recognized. Could not configure Draughtsman to load at startup.");

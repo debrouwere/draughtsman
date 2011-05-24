@@ -14,6 +14,7 @@
 	<array>
 		<string>/usr/local/bin/node</string>
 		<string>/usr/local/lib/node_modules/draughtsman/bin/draughtsman</string>
+		<string>{ROOT_DIR}</string>
 	</array>
 	<key>ServiceDescription</key>
 	<string>Draughtsman is a development-oriented web server and proxy. Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.</string>
