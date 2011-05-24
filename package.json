@@ -2,7 +2,7 @@
     "name": "draughtsman",
     "author": "Stijn Debrouwere",
     "description": "A development-oriented web server and proxy. Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.",
-    "version": "0.1",
+    "version": "0.1.0",
     "main": "./lib/app.js",
     "bin" : "./bin/draughtsman",
     "dependencies": {
@@ -17,7 +17,12 @@
     "repository": {
         "type": "git", 
         "url": "git://github.com/stdbrouw/draughtsman.git"
-    }
+    },
     "licenses":
-        [{"type": "MIT", "url": "http://github.com/stdbrouw/draughtsman/raw/master/LICENSE"}]
+        [{"type": "MIT", "url": "http://github.com/stdbrouw/draughtsman/raw/master/LICENSE"}], 
+    "scripts": {
+        "install": "node ./install/install.js",
+        "update" : "node ./install/install.js",
+        "uninstall" : "node ./install/uninstall.js"
+      }
 }

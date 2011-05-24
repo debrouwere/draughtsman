@@ -13,6 +13,8 @@ here = (paths...) ->
 
 # App
 
+exports.VERSION = '0.1'
+
 app = express.createServer()
 proxy = new http_proxy.HttpProxy()
 
@@ -95,6 +97,6 @@ exports.listen = (port, relay_server) ->
     proxy_server.listen port
     app.listen port+1
 
-    console.log "Draughtsman proxy listening on port #{port}, server on #{port+1}"
+    console.log "Draughtsman proxy v#{exports.VERSION} listening on port #{port}, server on #{port+1}"
     if relay_server?
         console.log "Relaying file handling for unknown file types to #{relay_server}"
