@@ -8,6 +8,8 @@ var stdout = process.stdout;
 var stdin = process.stdin;
 stdin.setEncoding('utf8');
 
+var default_proxy = "http://localhost:8888";
+
 if (os == 'Darwin') {
     var default_web_root = process.env.HOME + "/Sites";
     var init_script = '/org.draughtsman.plist';
@@ -22,7 +24,8 @@ if (os == 'Darwin') {
 
 var questions = [
     "Run and daemonize draughtsman at startup? [Y/n]: ",
-    "Drafts directory [" + default_web_root + "]: ",
+    "From which base directory will we serve? [" + default_web_root + "]: ",
+    "Which web server will handle unrecognized requests? [" + default_proxy + "]: "
     ];
 
 var answers = [];
