@@ -107,7 +107,7 @@ html
         a(href=crumb.path)= crumb.name
         |  / 
     h3 Directory listing
-    h1 #{directory}
+    h1= directory
     input(type='search', placeholder='search for a file or filetype')    
     ul#listing.listing
       - each file in listing
