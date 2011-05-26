@@ -39,6 +39,21 @@ annotate_with_filetypes = (files, recognized_filetypes, root) ->
             type: type
             }
 
+create_breadcrumbs = (path) ->
+    breadcrumbs = [{name: ".", path: "/"}]
+    path = path.split('/')
+
+    i = 0
+    while i < path.length
+        i++
+        continue unless path[i]
+        breadcrumbs.push {
+            name: path[i]
+            path: path[0..i].join('/') + '/'
+            }
+
+    return breadcrumbs
+
 exports.controller = (req, res) ->
     listing = fs.readdirSync req.file.path
 
@@ -53,7 +68,8 @@ exports.controller = (req, res) ->
 
     options = 
         locals:
-            directory: req.params[0] or '/'
+            breadcrumbs: create_breadcrumbs req.params[0]
+            directory: req.params[0].split('/').pop() or '/'
             listing: listing
             files: JSON.stringify(files)
 

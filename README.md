@@ -11,7 +11,7 @@ to your template.
 This application is solely intended to facilitate front-end prototyping. Once you or your
 team moves on from sketching, forget about Draughtsman and use a proper dev environment.
 
-It's only about a 200 lines of code. Take a look and adapt to your tastes.
+It's only about a 250 lines of code. Take a look and adapt to your tastes.
 
 ## Installation
 

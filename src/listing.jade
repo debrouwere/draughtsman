@@ -2,8 +2,20 @@
 html
   head
     style
+      h3 {
+        font-weight: normal;
+        font-size: 0.7em;
+        color: #666;
+        text-transform: uppercase;
+        margin: 1.5em 0 0 0;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+    
       body {
-        font-family: monaco, courier;
+        font-family: monaco, consolas, courier;
         margin: 50px auto;
         width: 550px;
         border: 1px solid #ccc;
@@ -15,9 +27,15 @@ html
         width: 100%;
       }
 
-      ul {
+      ul.listing {
         margin-top: 25px;
         padding-left: 0;
+      }
+
+      ul.breadcrumbs {
+        font-size: 0.9em;
+        margin: 0;
+        padding: 0;
       }
 
       li {
@@ -84,10 +102,15 @@ html
         });
       
   body
-    h1 Directory listing for #{directory}
+    ul.breadcrumbs
+      - each crumb in breadcrumbs
+        a(href=crumb.path)= crumb.name
+        |  / 
+    h3 Directory listing
+    h1 #{directory}
     input(type='search', placeholder='search for a file or filetype')    
-    ul#listing
+    ul#listing.listing
       - each file in listing
         li(class=file.type)
           a(href=file.path)= file.path
-    ul#search
+    ul#search.listing
