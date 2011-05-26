@@ -9,5 +9,7 @@ render_plate = (req, res) ->
         res.send html
 
 module.exports = (app) ->
+    app.accepts.push 'plate'
+    app.accepts.push 'dtl'
     app.get /^(.*\.plate)$/, render_plate
     app.get /^(.*\.dtl)$/, render_plate

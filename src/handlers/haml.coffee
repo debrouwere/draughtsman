@@ -2,6 +2,7 @@ context = require '../context'
 haml = require 'haml'
 
 module.exports = (app) ->
+    app.accepts.push 'haml'
     app.get /^(.*\.haml)$/, (req, res) ->
         vars = context.find_template_variables req.file.path
         html = haml(req.file.content)(vars)

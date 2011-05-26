@@ -1,15 +1,10 @@
-_ = require 'underscore'
 fs = require 'fs'
 path = require 'path'
 http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
-jade = require 'jade'
-
-here = (paths...) ->
-    paths = [__dirname].concat paths
-    path.join.apply this, paths
+listing = require './listing'
 
 # App
 
@@ -17,6 +12,8 @@ exports.VERSION = '0.1'
 
 app = express.createServer()
 proxy = new http_proxy.HttpProxy()
+
+app.accepts = []
 
 ROOT = process.argv[2]
 
@@ -37,42 +34,15 @@ app.get '*', (req, res, next) ->
             res.send 404
 
 # this is where the magic happens
-for handler in fs.readdirSync here "handlers"
-    handler_path = here "handlers", handler.replace(".coffee", "")
+for handler in fs.readdirSync listing.here "handlers"
+    handler_path = listing.here "handlers", handler.replace(".coffee", "")
     require(handler_path)(app) 
 
 # directory listing
-get_files = (base) ->
-    files = fs.readdirSync base
-    files = files.map (file) ->
-        path = base + "/" + file
-        try
-            stat = fs.statSync(path)
-        catch error
-            return [null]
-        
-        if stat.isDirectory()
-            return get_files path
-        else
-            return [path]
-    return files
 
-app.get /^(.*)\/$/, (req, res) ->
-    listing = fs.readdirSync ROOT
+app.get /^(.*)\/$/, listing.controller
 
-    # all files, for our search function
-    if require('optimist').argv['search-tree']?
-        files = require('findit').findSync ROOT
-    else
-        files = listing
-
-    options = 
-        locals:
-            listing: listing
-            files: JSON.stringify(files)
-
-    jade.renderFile here('listing.jade'), options, (err, html) ->
-        res.send html
+# start server and proxy server
 
 exports.listen = (port, relay_server) ->
     # init

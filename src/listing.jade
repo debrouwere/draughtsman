@@ -35,6 +35,14 @@ html
         color: #2e3a46;
       }
 
+      li.folder a {
+        font-weight: bold;
+      }
+
+      li.file a {
+        color: #999;
+      }
+
     script var files = !{files};
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js')
     script
@@ -62,11 +70,11 @@ html
             }
             
             var matches = files.filter(function(file){
-                return file.indexOf(query) != -1;
+                return file.path.indexOf(query) != -1;
             });
             $("ul#search").empty();
             matches.forEach(function(match){
-                $("<li>" + a(match) + "</li>").appendTo("ul#search");
+                $("<li class='" + match.type + "'>" + a(match.path) + "</li>").appendTo("ul#search");
             });
         }
     
@@ -76,10 +84,10 @@ html
         });
       
   body
-    h1 Directory listing for /
+    h1 Directory listing for #{directory}
     input(type='search', placeholder='search for a file or filetype')    
     ul#listing
       - each file in listing
-        li
-          a(href=file)= file
+        li(class=file.type)
+          a(href=file.path)= file.path
     ul#search
