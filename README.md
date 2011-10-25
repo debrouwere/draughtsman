@@ -58,7 +58,7 @@ login or startup just like your web server. The installation script can do this 
 ## An example
 
 You can see an example in action by cd'ing to wherever you have draughtsman installed and
-running `bin/draughtsman ./test/example`.
+running `draughtsman ./test/example`.
 
 ## Adding handlers
 
