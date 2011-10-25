@@ -1,0 +1,116 @@
+!!! 5
+html
+  head
+    style
+      h3 {
+        font-weight: normal;
+        font-size: 0.7em;
+        color: #666;
+        text-transform: uppercase;
+        margin: 1.5em 0 0 0;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+    
+      body {
+        font-family: monaco, consolas, courier;
+        margin: 50px auto;
+        width: 550px;
+        border: 1px solid #ccc;
+        border-top-width: 5px;
+        padding: 25px;
+      }
+
+      input {
+        width: 100%;
+      }
+
+      ul.listing {
+        margin-top: 25px;
+        padding-left: 0;
+      }
+
+      ul.breadcrumbs {
+        font-size: 0.9em;
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        list-style-type: none;
+        padding-left: 15px;
+        margin-bottom: 10px;
+      }
+
+      a {
+        color: #00609d;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #2e3a46;
+      }
+
+      li.folder a {
+        font-weight: bold;
+      }
+
+      li.file a {
+        color: #666;
+      }
+
+    script var files = !{files};
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js')
+    script
+        function a (link) {
+            return '<a href="' + link + '">' + link + '</a>'
+        }
+    
+        function toggle_search_form(state) {
+            if (state) {
+                $("ul#listing").hide();
+                $("ul#search").show();
+            } else {
+                $("ul#listing").show();
+                $("ul#search").hide();
+            }
+        }
+    
+        function display_search_results() {
+            var query = $(this).val();
+            if (query.length === 0) {
+                toggle_search_form(false);
+                return;
+            } else {
+                toggle_search_form(true);
+            }
+            
+            var matches = files.filter(function(file){
+                return file.path.indexOf(query) != -1;
+            });
+            $("ul#search").empty();
+            matches.forEach(function(match){
+                $("<li class='" + match.type + "'>" + a(match.path) + "</li>").appendTo("ul#search");
+            });
+        }
+    
+        $(document).ready(function(){
+            $("ul#search").hide();
+            $("input").bind('keyup click', display_search_results);
+        });
+      
+  body
+    ul.breadcrumbs
+      - each crumb in breadcrumbs
+        a(href=crumb.path)= crumb.name
+        |  / 
+    h3 Directory listing
+    h1= directory
+    input(type='search', placeholder='search for a file or filetype')    
+    ul#listing.listing
+      - each file in listing
+        li(class=file.type)
+          a(href=file.path)= file.path
+    ul#search.listing
