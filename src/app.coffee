@@ -31,7 +31,18 @@ app.get '*', (req, res, next) ->
                     content: content
                 next()
         else
-            res.send 404
+            # try built-in resources (like jquery and underscore)
+            resource = path.join listing.here("resources"), req.params[0]
+            console.log resource
+            path.exists resource, (exists) ->
+                if exists
+                    res.sendfile resource
+                else
+                    res.send 404
+
+# built-in resources
+#app.get '_resources/:script', (req, res) -> 
+#    res.sendfile path.join __here, 
 
 # this is where the magic happens
 for handler in fs.readdirSync listing.here "handlers"

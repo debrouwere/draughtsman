@@ -1,6 +1,7 @@
 var sys = require('sys');
 var fs = require('fs');
 var os = require('os').type();
+var exec = require('child_process').exec;
 
 /* init */
 
@@ -37,13 +38,19 @@ function configure(answers) {
     if (run_on_startup) {
         if (os == 'Darwin' || os == 'Linux') {
             var script = fs.readFileSync(__dirname + init_script, 'utf8').replace('{ROOT_DIR}', web_root);
-            fs.writeFileSync(init_dir + init_script, script, 'utf8');
-            stdout.write("Next time you reboot, Draughtsman will be at your service at port 3400 on your localhost, processing files in " + web_root + "\n");
+            var filename = init_dir + init_script;
+            fs.writeFileSync(filename, script, 'utf8');
+            if (os == 'Darwin') {
+                exec('launchctl load ' + filename);
+            } else {
+                exec('start draughtsman');
+            }
+            stdout.write("Draughtsman will shortly be at your service, listening to  port 3400 on your localhost, processing files in " + web_root + "\n");
         } else {
             stdout.write("OS not recognized. Could not configure Draughtsman to load at startup.");
         }
     }
-    stdout.write("Draughtsman has been successfully installed. You can run it from your shell using the `draughtsman` command.");
+    stdout.write("Draughtsman has been successfully installed. You can run it from your shell using the `draughtsman` command.\n");
 }
 
 /* main */

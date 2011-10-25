@@ -11,8 +11,11 @@
         "jade": "latest", 
         "stylus": "latest",
         "yaml": "latest",
+        "haml": "latest",
         "underscore": "latest",
-        "findit": "latest"
+        "findit": "latest",
+        "optimist": "latest",
+        "http-proxy": "latest"
     },
     "repository": {
         "type": "git", 

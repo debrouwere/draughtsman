@@ -4,3 +4,4 @@ task 'build', 'build the application', ->
     exec 'coffee -co lib src'
     exec 'cp src/listing.jade lib'
     exec 'cp src/handlers/*.js lib/handlers'
+    exec 'cp -r src/resources lib'
