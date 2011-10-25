@@ -22,7 +22,7 @@ running `draughtsman ./test/example`.
 
 ## Installation
 
-`npm install draughtsman -g` should do the trick.
+`npm install draughtsman -g` should do the trick. You should have `node.js` and `npm` installed though. Instructions at https://github.com/joyent/node/wiki/Installation.
 
 ## Usage
 
