@@ -66,12 +66,12 @@ exports.controller = (req, res) ->
     listing = annotate_with_filetypes listing, req.app.accepts, req.file.path
     files = annotate_with_filetypes files, req.app.accepts, req.file.path
 
-    options = 
-        locals:
-            breadcrumbs: create_breadcrumbs req.params[0]
-            directory: req.params[0].split('/').pop() or '/'
-            listing: listing
-            files: JSON.stringify(files)
+    locals = 
+        breadcrumbs: create_breadcrumbs req.params[0]
+        directory: req.params[0].split('/').pop() or '/'
+        listing: listing
+        files: JSON.stringify(files)
 
-    jade.renderFile here('listing.jade'), options, (err, html) ->
-        res.send html
+    fs.readFile here('listing.jade'), 'utf8', (err, data) ->
+        tpl = jade.compile data
+        res.send tpl locals

@@ -8,10 +8,10 @@ listing = require './listing'
 
 # App
 
-exports.VERSION = '0.1'
+exports.VERSION = '0.2.1'
 
 app = express.createServer()
-proxy = new http_proxy.HttpProxy()
+proxy = new http_proxy.RoutingProxy()
 
 app.accepts = []
 
@@ -25,7 +25,7 @@ app.get '*', (req, res, next) ->
     file = ROOT + req.params[0]
     path.exists file, (exists) ->
         if exists
-            fs.readFile file, 'utf-8', (err, content) ->
+            fs.readFile file, 'utf8', (err, content) ->
                 req.file =
                     path: file
                     content: content
@@ -33,16 +33,11 @@ app.get '*', (req, res, next) ->
         else
             # try built-in resources (like jquery and underscore)
             resource = path.join listing.here("resources"), req.params[0]
-            console.log resource
             path.exists resource, (exists) ->
                 if exists
                     res.sendfile resource
                 else
                     res.send 404
-
-# built-in resources
-#app.get '_resources/:script', (req, res) -> 
-#    res.sendfile path.join __here, 
 
 # this is where the magic happens
 for handler in fs.readdirSync listing.here "handlers"

@@ -5,6 +5,6 @@ module.exports = (app) ->
     app.accepts.push 'jade'
     app.get /^(.*\.jade)$/, (req, res) ->
         vars = context.find_template_variables req.file.path
-        html = jade.render req.file.content, {locals: vars}
+        tpl = jade.compile req.file.content
         res.contentType 'text/html'
-        res.send html
+        res.send tpl vars

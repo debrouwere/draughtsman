@@ -50,16 +50,15 @@ For NGINX, try something like this:
         }
     }
 
-## Daemonize
+## Daemonize and run on startup
 
 For additional convenience, you may want to deamonize the application and run it after 
-login or startup just like your web server. Use whatever method or tool you prefer; 
-upstart is a good bet if you're on Ubuntu.
+login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
 
 ## An example
 
 You can see an example in action by cd'ing to wherever you have draughtsman installed and
-running `cake build; bin/draughtsman ./test/example`.
+running `bin/draughtsman ./test/example`.
 
 ## Adding handlers
 
