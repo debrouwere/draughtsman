@@ -15,6 +15,10 @@ It's only about a 250 lines of code. Take a look and adapt to your tastes.
 
 ## Installation
 
+`npm install draughtsman -g` should do the trick.
+
+## Usage
+
 Draughtsman can work as a standalone web server, a proxy or a reverse proxy.
 
 To use Draughtsman as a rudimentary web server (bypassing e.g. Apache entirely), simply start up 
