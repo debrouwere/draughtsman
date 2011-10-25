@@ -8,10 +8,17 @@ In addition to parsing .styl, .coffee and .jade files, Draughtsman will also sea
 an eponymous .yml, .txt or .json file and use whatever it finds there to feed dummy data 
 to your template.
 
+As an added convenience, draughtsman comes with recent versions of a couple of very common CSS and Javascript libraries: Twitter Bootstrap, jQuery and underscore.js. These are automagically available underneath your localhost root as `/bootstrap/bootstrap.css`, `/jquery.js` and `/underscore.js`. That way, you can prototype on the plane or in a coffee shop with crappy wifi.
+
 This application is solely intended to facilitate front-end prototyping. Once you or your
 team moves on from sketching, forget about Draughtsman and use a proper dev environment.
 
 It's only about a 250 lines of code. Take a look and adapt to your tastes.
+
+## An example
+
+You can see an example in action by cd'ing to wherever you have draughtsman installed and
+running `draughtsman ./test/example`.
 
 ## Installation
 
@@ -59,11 +66,6 @@ For NGINX, try something like this:
 For additional convenience, you may want to deamonize the application and run it after 
 login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
 
-## An example
-
-You can see an example in action by cd'ing to wherever you have draughtsman installed and
-running `draughtsman ./test/example`.
-
 ## Adding handlers
 
 Draughtsman processes Jade templates, CoffeeScript and Stylus out of the box. You can however
@@ -108,3 +110,7 @@ alternative implementation of a CoffeeScript handler:
 Using `exec` is particularly useful for compilers that are intended to be used through the
 shell, such as for the SASS stylesheet preprocessor, or when you need to write your own precompiler, 
 for example a Python script that renders a file using the Jinja or Django template language.
+
+## Adding resources
+
+Draughtsman comes with jQuery, underscore.js and Twitter Bootstrap out of the box, available under the root (e.g. `/jquery.js`) but you can add the libraries you use most as resources too: just add them to the `/src/resources` directory and do a `cake build` so they'll end up in `lib` too.
