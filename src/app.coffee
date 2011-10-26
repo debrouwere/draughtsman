@@ -9,7 +9,7 @@ liveloader = require './liveloader'
 
 # App
 
-exports.VERSION = '0.2.1'
+exports.VERSION = '0.3.0'
 
 app = express.createServer()
 liveloader.enable app
