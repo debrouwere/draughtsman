@@ -1,0 +1,10 @@
+<html>
+    <head>
+        <link href='style.styl' rel='stylesheet' type='text/css' />
+        <title>{{ title }}</title>
+    <body>
+        <h1>{{ title }}</h1>
+        <p>description</p>
+        <script src='script.coffee'></script>
+    </body>
+</html>
