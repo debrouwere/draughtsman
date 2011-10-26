@@ -6,7 +6,7 @@ render_plate = (req, res) ->
     template = new plate.Template req.file.content
     template.render vars, (err, html) ->
         res.contentType 'text/html'
-        res.send html
+        res.live html
 
 module.exports = (app) ->
     app.accepts.push 'plate'

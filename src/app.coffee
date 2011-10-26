@@ -10,15 +10,37 @@ listing = require './listing'
 
 exports.VERSION = '0.2.1'
 
+# WebSockets aren't yet as fast as they could/should be in all browsers, 
+# so we're sticking to polling for now.
+config =
+    socketio:
+        transports: ['xhr-polling', 'jsonp-polling']
+
 app = express.createServer()
+everyone = require("now").initialize(app, config)
 proxy = new http_proxy.RoutingProxy()
 
 app.accepts = []
 
 ROOT = process.argv[2]
 
+everyone.now.liveload = (files) ->
+    console.log files
+    everyone.now.reload()
+
 app.get '*', (req, res, next) ->
     res.header 'Cache-Control', 'no-cache, must-revalidate'
+
+    res.live = (str) ->
+        html = str.replace(
+            "</body>", 
+            "<script src='http://#{req.headers.host}/nowjs/now.js'></script>
+            <script src='/reloader.js'></script>
+            </body>"
+            )
+
+        res.send html
+
     next()
 
 app.get '*', (req, res, next) ->
