@@ -1,19 +1,14 @@
-Draughtsman is an MIT-licensed tool for front-end developers who want a cutting-edge
-stack while prototyping (like Jade, Stylus and CoffeeScript for you node.js aficionados), 
-but can't be bothered to run all sorts of command-line tools and who don't want to 
-set up an entire project structure simply to test out a few layouts in their favorite
-CSS alternative.
+Draughtsman is an MIT-licensed tool for front-end developers who want a cutting-edge stack while prototyping (like Jade, Stylus and CoffeeScript for you node.js aficionados, HAML for Rails nuts and the Django template language for Pythonistas), but can't be bothered to run all sorts of command-line tools and who don't want to set up an entire project structure simply to test out a few layouts in their favorite CSS alternative.
 
-In addition to parsing .styl, .coffee and .jade files, Draughtsman will also search for
-an eponymous .yml, .txt or .json file and use whatever it finds there to feed dummy data 
-to your template.
+In addition to **precompilation** of .styl, .coffee, .dtl and .jade files, Draughtsman will also search for an eponymous .yml, .txt or .json file and use whatever it finds there to feed **dummy data** to your template.
 
-As an added convenience, draughtsman comes with recent versions of a couple of very common CSS and Javascript libraries: Twitter Bootstrap, jQuery and underscore.js. These are automagically available underneath your localhost root as `/bootstrap/bootstrap.css`, `/jquery.js` and `/underscore.js`. That way, you can prototype on the plane or in a coffee shop with crappy wifi.
+What's more, your prototype will **live-update** whenever you change something. If you have an HTML prototype loaded in your browser and you change the template, a script or CSS, draughtsman will automatically refresh your browser tab for you. (Web Sockets, powerful stuff.)
 
-This application is solely intended to facilitate front-end prototyping. Once you or your
-team moves on from sketching, forget about Draughtsman and use a proper dev environment.
+As an added convenience, draughtsman comes with recent versions of common **CSS and Javascript libraries**: [Twitter Bootstrap](http://twitter.github.com/bootstrap/), [jQuery](http://jquery.com/) and [underscore.js](http://documentcloud.github.com/underscore/). These are automagically available underneath your localhost root as `/bootstrap/bootstrap.css`, `/jquery.js` and `/underscore.js`. That way, you can prototype on the plane or in a coffee shop with crappy wifi.
 
-It's only about a 250 lines of code. Take a look and adapt to your tastes.
+This application is solely intended to facilitate front-end prototyping. Once you or your team moves on from sketching, forget about Draughtsman and use a proper dev environment.
+
+It's less than 500 lines of code. Take a look and adapt to your tastes.
 
 ## An example
 
@@ -28,15 +23,13 @@ running `draughtsman ./test/example`.
 
 Draughtsman can work as a standalone web server, a proxy or a reverse proxy.
 
-To use Draughtsman as a rudimentary web server (bypassing e.g. Apache entirely), simply start up 
-the app by opening up a terminal and execute `draughtsman /my/basepath`. Surf to http://0.0.0.0:3400/ for a directory listing and take it from there.
+To use Draughtsman as a rudimentary web server (bypassing e.g. Apache entirely), simply start up the app by opening up a terminal and execute `draughtsman /my/basepath`. Surf to http://0.0.0.0:3400/ for a directory listing and take it from there.
 
-You can also use Draughtsman as a proxy: it'll process any file formats it knows about, 
-and forward any other requests, like for PHP files, to a proper web server of your choosing.
+You can also use Draughtsman as a proxy: it'll process any file formats it knows about, and forward any other requests, like for PHP files, to a proper web server of your choosing.
+
 To use Draughtsman as a proxy, use the `--relay` argument, e.g. `draughtsman ./test/example --port 5000 --relay http://localhost:8888`.
 
-To use Draughtsman as a reverse proxy, you'll need to configure your main web server. For Apache, 
-a configuration like this should work:
+To use Draughtsman as a reverse proxy, you'll need to configure your main web server. For Apache, a configuration like this should work:
 
     <VirtualHost *:*>
         <Location />
@@ -63,14 +56,11 @@ For NGINX, try something like this:
 
 ## Daemonize and run on startup
 
-For additional convenience, you may want to deamonize the application and run it after 
-login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
+For additional convenience, you may want to deamonize the application and run it after login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
 
 ## Adding handlers
 
-Draughtsman processes Jade templates, CoffeeScript and Stylus out of the box. You can however
-easily add your own handler to `src/handlers`. The code should export a factory that outputs
-an express.js controller, written in either CoffeeScript (as in the examples below) or 
+Draughtsman processes Jade templates, Django templates, HAML, CoffeeScript and Stylus out of the box. You can however easily add your own handler to `src/handlers`. The code should export a factory that outputs an express.js controller, written in either CoffeeScript (as in the examples below) or 
 JavaScript.
 
 A handler looks something like this: 
@@ -78,6 +68,7 @@ A handler looks something like this:
     stylus = require 'stylus'
     
     module.exports = (app) ->
+        app.accepts.push 'styl'
         app.get /^(.*\.styl)$/, (req, res) ->
             stylus(req.file.content).render (err, css) ->
                 if err
@@ -89,6 +80,9 @@ A handler looks something like this:
 The requested file (in its plain/uncompiled state) will be available to you in `req.file.content`, 
 and the file path is accessible through `req.file.path`.
 
+Handlers for template languages should preferably **use `res.live` instead of `res.send` to enable
+automatic reloading**.
+
 Draughtsman automatically picks up any and all handlers in the `handlers` directory, though
 you'll need to run `cake build` on the app to recompile the code to include your handlers.
 
@@ -99,6 +93,7 @@ alternative implementation of a CoffeeScript handler:
     exec = require('child_process').exec
 
     module.exports = (app) ->
+        app.accepts.push 'coffee'
         app.get /^(.*\.coffee)$/, (req, res) ->
             exec 'coffee -cp #{req.file.path}', (error, stdout, stderr) ->
                 if error
@@ -110,6 +105,8 @@ alternative implementation of a CoffeeScript handler:
 Using `exec` is particularly useful for compilers that are intended to be used through the
 shell, such as for the SASS stylesheet preprocessor, or when you need to write your own precompiler, 
 for example a Python script that renders a file using the Jinja or Django template language.
+
+All handlers should reside in `/src/handlers` regardless of whether they are JavaScript or CoffeeScript, and you should build the app using `cake build` and restart draughtsman to make sure it picks up on the latest changes.
 
 ## Adding resources
 

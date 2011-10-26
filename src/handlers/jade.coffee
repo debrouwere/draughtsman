@@ -7,4 +7,4 @@ module.exports = (app) ->
         vars = context.find_template_variables req.file.path
         tpl = jade.compile req.file.content
         res.contentType 'text/html'
-        res.send tpl vars
+        res.live tpl vars

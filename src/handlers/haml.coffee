@@ -7,4 +7,4 @@ module.exports = (app) ->
         vars = context.find_template_variables req.file.path
         html = haml(req.file.content)(vars)
         res.contentType 'text/html'
-        res.send html
+        res.live html
