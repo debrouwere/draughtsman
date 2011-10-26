@@ -24,9 +24,29 @@ app.accepts = []
 
 ROOT = process.argv[2]
 
-everyone.now.liveload = (files) ->
-    console.log files
-    everyone.now.reload()
+is_local = (location) ->
+    if location.indexOf('localhost') > -1
+        yes
+    else
+        no
+
+absolutize = (host, base, location) ->
+    dir = path.dirname base
+    if dir is '/' then dir = ''
+    location.replace("http://#{host}", "#{ROOT}#{dir}")
+
+everyone.now.liveload = (host, path, files) ->
+    # find the local files we need to watch for changes
+    files = files.filter is_local
+    files = files.map (file) -> absolutize(host, path, file)
+
+    files.forEach (file) ->
+        fs.watchFile file, {persistent: true, interval:200}, (curr, prev) ->
+            if curr.mtime > prev.mtime
+                console.log "Reloading #{path} due to a change in #{file}"
+                # we'll start watching these again after the reload
+                fs.unwatchFile(resource) for resource in files
+                everyone.now.reload()
 
 app.get '*', (req, res, next) ->
     res.header 'Cache-Control', 'no-cache, must-revalidate'
