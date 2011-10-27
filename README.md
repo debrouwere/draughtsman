@@ -31,7 +31,7 @@ For additional convenience, you may want to deamonize the application and run it
 
 ## Advanced usage
 
-You can also use Draughtsman as a proxy: it'll process any file formats it knows about, and forward any other requests, like for PHP files, to a proper web server of your choosing.
+You can also use Draughtsman as a proxy: it'll process any file formats it knows about, and forward any other requests, like for PHP files, to a proper web server of your choosing. This saves you from having to switch back and forth and back and forth between URLs if you have need for a secondary web server like Apache.
 
 To use Draughtsman as a proxy, use the `--relay` argument, e.g. `draughtsman ./test/example --port 5000 --relay http://localhost:8888`.
 

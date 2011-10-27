@@ -1,6 +1,6 @@
 fs = require 'fs'
 optimist = require 'optimist'
-draughtsman = require './app'
+draughtsman = require './server'
 
 argv = require('optimist').argv
 

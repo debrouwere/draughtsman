@@ -3,7 +3,7 @@
     "author": "Stijn Debrouwere",
     "description": "A development-oriented web server and proxy. Transparent compilation of templates, stylesheets and scripts for stackless HTML interface prototyping.",
     "version": "0.4.0",
-    "main": "./lib/app.js",
+    "main": "./lib/server.js",
     "bin" : "./bin/draughtsman",
     "dependencies": {
         "coffee-script": "1.x", 
