@@ -37,7 +37,8 @@ app.get '*', (req, res, next) ->
                 else
                     res.send 404
 
-# this is where the magic happens
+# this is where the magic happens and
+# all the handlers get loaded
 for handler in fs.readdirSync listing.here "handlers"
     handler_path = listing.here "handlers", handler.replace(".coffee", "")
     require(handler_path)(app) 

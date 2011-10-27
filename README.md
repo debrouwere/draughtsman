@@ -25,6 +25,12 @@ Draughtsman can work as a standalone web server, a proxy or a reverse proxy.
 
 To use Draughtsman as a rudimentary web server (bypassing e.g. Apache entirely), simply start up the app by opening up a terminal and execute `draughtsman /my/basepath`. Surf to http://0.0.0.0:3400/ for a directory listing and take it from there.
 
+## Daemonize and run on startup
+
+For additional convenience, you may want to deamonize the application and run it after login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
+
+## Advanced usage
+
 You can also use Draughtsman as a proxy: it'll process any file formats it knows about, and forward any other requests, like for PHP files, to a proper web server of your choosing.
 
 To use Draughtsman as a proxy, use the `--relay` argument, e.g. `draughtsman ./test/example --port 5000 --relay http://localhost:8888`.
@@ -53,10 +59,6 @@ For NGINX, try something like this:
             proxy_redirect    default;
         }
     }
-
-## Daemonize and run on startup
-
-For additional convenience, you may want to deamonize the application and run it after login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
 
 ## Adding handlers
 
