@@ -7,5 +7,5 @@ module.exports =
     mime: 'text/html'
     compiler: (file, variables, send) ->
         template = new plate.Template file.content
-        template.render vars, (err, html) ->
+        template.render variables, (err, html) ->
             send html
