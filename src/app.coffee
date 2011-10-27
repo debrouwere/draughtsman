@@ -47,12 +47,11 @@ app.get '*', (req, res, next) ->
                 else
                     res.send 404
 
-# this is where the magic happens and
-# all the handlers get loaded
+# this is where the magic happens and all the 
+# handlers get loaded and registered
 for handler in fs.readdirSync listing.here "handlers"
     handler_path = listing.here "handlers", handler.replace(".coffee", "")
     handler = require(handler_path) 
-    
     writers.web(app, handler)
 
 # directory listing

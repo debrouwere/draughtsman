@@ -13,4 +13,7 @@ exports.web = (app, handler) ->
         # this executes the compiler and sends res[dispatch]
         # along as the callback, so we can easily support both
         # synchronous and asynchronous handlers
-        handler.compiler req.file, variables, res[dispatch]
+        handler.compiler req.file, variables, (output) ->
+            res[dispatch] output
+
+exports.fs = (root, handler) ->
