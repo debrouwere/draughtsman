@@ -19,15 +19,23 @@ app.accepts = []
 
 ROOT = process.argv[2]
 
-app.get '*', (req, res, next) ->
-    file = ROOT + req.params[0]
+load_source = (callback) ->
     path.exists file, (exists) ->
         if exists
             fs.readFile file, 'utf8', (err, content) ->
-                req.file =
+                callback
                     path: file
                     content: content
-                next()
+        else
+            callback null
+
+app.get '*', (req, res, next) ->
+    file = ROOT + req.params[0]
+
+    load_source (source) ->
+        if source
+            req.file = source
+            next()
         else
             # try built-in resources (like jquery and underscore)
             resource = path.join listing.here("resources"), req.params[0]
