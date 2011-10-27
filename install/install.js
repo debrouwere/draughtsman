@@ -1,6 +1,7 @@
-var sys = require('sys');
-var fs = require('fs');
-var os = require('os').type();
+var sys  = require('sys');
+var fs   = require('fs');
+var path = require('path');
+var os   = require('os').type();
 var exec = require('child_process').exec;
 
 /* init */
@@ -30,6 +31,9 @@ var questions = [
     ];
 
 var answers = [];
+
+console.log(path.dirname(__dirname));
+exec('mkdir lib; cake build', {'cwd': path.dirname(__dirname)});
 
 function configure(answers) {
     answers = answers.map(function(answer){ return answer.replace(/\n/, ''); });

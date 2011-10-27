@@ -1,4 +1,3 @@
-context = require '../context'
 plate = require 'plate'
 
 module.exports =
