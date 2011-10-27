@@ -1,10 +1,7 @@
-context = require '../context'
 haml = require 'haml'
 
-module.exports = (app) ->
-    app.accepts.push 'haml'
-    app.get /^(.*\.haml)$/, (req, res) ->
-        vars = context.find_template_variables req.file.path
-        html = haml(req.file.content)(vars)
-        res.contentType 'text/html'
-        res.live html
+module.exports =
+    match: /^(.*\.haml)$/
+    mime: 'text/html'
+    compiler: (file, context, send) ->
+        send haml(file.content)(context)

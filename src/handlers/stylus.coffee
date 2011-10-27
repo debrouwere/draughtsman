@@ -1,11 +1,11 @@
 stylus = require 'stylus'
 
-module.exports = (app) ->
-    app.accepts.push 'styl'
-    app.get /^(.*\.styl)$/, (req, res) ->
-        stylus(req.file.content).render (err, css) ->
+module.exports =
+    match: /^(.*\.styl)$/
+    mime: 'text/css'
+    compiler: (file, variables, send) ->
+        stylus(file.content).render (err, css) ->
             if err
-                res.send err
+                send err
             else
-                res.contentType 'text/css'
-                res.send css   
+                send css   

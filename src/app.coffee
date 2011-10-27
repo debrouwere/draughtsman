@@ -4,7 +4,7 @@ http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
-context = require './context'
+writers = require './writers'
 listing = require './listing'
 liveloader = require './liveloader'
 
@@ -49,20 +49,11 @@ app.get '*', (req, res, next) ->
 
 # this is where the magic happens and
 # all the handlers get loaded
-for handler in ['jade.coffee'] #fs.readdirSync listing.here "handlers"
+for handler in fs.readdirSync listing.here "handlers"
     handler_path = listing.here "handlers", handler.replace(".coffee", "")
     handler = require(handler_path) 
     
-    app.get handler.match, (req, res) ->
-        if handler.mime is 'text/html'
-            dispatch = 'live'
-            variables = context.find_template_variables req.file.path
-        else
-            dispatch = 'send'
-            variables = null
-    
-        res.contentType handler.mime
-        res[dispatch] handler.compiler(req.file, variables)
+    writers.web(app, handler)
 
 # directory listing
 

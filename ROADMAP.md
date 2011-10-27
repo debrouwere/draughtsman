@@ -1,5 +1,6 @@
 More of a wishlist / one day maybe than a roadmap really...
 
+* Better error handling
 * A Homebrew formula and a deb/ubuntu package
 * A cli flag to disable live reloading, as well as a URL argument ?nolive
 * Support for layout templates and partials (underscore convention?)

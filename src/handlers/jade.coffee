@@ -3,6 +3,6 @@ jade = require 'jade'
 module.exports =
     match: /^(.*\.jade)$/
     mime: 'text/html'
-    compiler: (file, variables) ->
+    compiler: (file, variables, send) ->
         tpl = jade.compile file.content
-        tpl variables
+        send tpl variables
