@@ -4,7 +4,7 @@ http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
-writers = require './writers'
+context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
 
@@ -15,9 +15,6 @@ exports.VERSION = '0.3.0'
 app = express.createServer()
 liveloader.enable app
 proxy = new http_proxy.RoutingProxy()
-
-# DEPRECATED
-app.accepts = []
 
 ROOT = process.argv[2]
 
@@ -47,12 +44,29 @@ app.get '*', (req, res, next) ->
                 else
                     res.send 404
 
+# transforms a generic handler/compiler into an express.js view
+register = (handler, app) ->
+    app.get handler.match, (req, res) ->
+        if handler.mime is 'text/html'
+            dispatch = 'live'
+            variables = context.find_template_variables req.file.path
+        else
+            dispatch = 'send'
+            variables = null
+    
+        res.contentType handler.mime
+        # this executes the compiler and sends res[dispatch]
+        # along as the callback, so we can easily support both
+        # synchronous and asynchronous handlers
+        handler.compiler req.file, variables, (output) ->
+            res[dispatch] output
+
 # this is where the magic happens and all the 
 # handlers get loaded and registered
 for handler in fs.readdirSync listing.here "handlers"
     handler_path = listing.here "handlers", handler.replace(".coffee", "")
     handler = require(handler_path) 
-    writers.web(app, handler)
+    register handler, app
 
 # directory listing
 
