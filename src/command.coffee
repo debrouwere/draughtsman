@@ -1,15 +1,13 @@
 fs = require 'fs'
 optimist = require 'optimist'
-draughtsman = require './server'
+server = require './server'
+generator = require './generator'
 
 argv = require('optimist').argv
 
 exports.run = ->
-    console.log process.argv[2]
-    console.log argv
-
-    if process.argv[2] is 'draw'
-        console.log 'drawing'
+    if argv._[0] is 'build'
+        generator.generate argv._[1], argv._[2]
     else
         port = argv.port or 3400
-        draughtsman.listen port, argv.relay
+        server.listen port, argv.relay

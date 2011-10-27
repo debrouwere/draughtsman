@@ -22,6 +22,10 @@ if (os == 'Darwin') {
     var init_dir = "/etc/init";
 }
 
+/* build process */
+
+exec('mkdir lib; cake build', {'cwd': path.dirname(__dirname)});
+
 /* logic */
 
 var questions = [
@@ -31,9 +35,6 @@ var questions = [
     ];
 
 var answers = [];
-
-console.log(path.dirname(__dirname));
-exec('mkdir lib; cake build', {'cwd': path.dirname(__dirname)});
 
 function configure(answers) {
     answers = answers.map(function(answer){ return answer.replace(/\n/, ''); });
