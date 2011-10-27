@@ -4,6 +4,7 @@ http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
+context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
 
@@ -15,11 +16,12 @@ app = express.createServer()
 liveloader.enable app
 proxy = new http_proxy.RoutingProxy()
 
+# DEPRECATED
 app.accepts = []
 
 ROOT = process.argv[2]
 
-load_source = (callback) ->
+load_source = (file, callback) ->
     path.exists file, (exists) ->
         if exists
             fs.readFile file, 'utf8', (err, content) ->
@@ -32,7 +34,7 @@ load_source = (callback) ->
 app.get '*', (req, res, next) ->
     file = ROOT + req.params[0]
 
-    load_source (source) ->
+    load_source file, (source) ->
         if source
             req.file = source
             next()
@@ -47,9 +49,20 @@ app.get '*', (req, res, next) ->
 
 # this is where the magic happens and
 # all the handlers get loaded
-for handler in fs.readdirSync listing.here "handlers"
+for handler in ['jade.coffee'] #fs.readdirSync listing.here "handlers"
     handler_path = listing.here "handlers", handler.replace(".coffee", "")
-    require(handler_path)(app) 
+    handler = require(handler_path) 
+    
+    app.get handler.match, (req, res) ->
+        if handler.mime is 'text/html'
+            dispatch = 'live'
+            variables = context.find_template_variables req.file.path
+        else
+            dispatch = 'send'
+            variables = null
+    
+        res.contentType handler.mime
+        res[dispatch] handler.compiler(req.file, variables)
 
 # directory listing
 
