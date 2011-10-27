@@ -48,7 +48,6 @@ for handler in fs.readdirSync listing.here "handlers"
 app.get /^(.*)\/$/, listing.controller
 
 # start server and proxy server
-
 exports.listen = (port, relay_server) ->
     # init
     port = parseInt port
