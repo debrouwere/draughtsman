@@ -25,6 +25,10 @@ Draughtsman can work as a standalone web server, a proxy or a reverse proxy.
 
 To use Draughtsman as a rudimentary web server (bypassing e.g. Apache entirely), simply start up the app by opening up a terminal and execute `draughtsman /my/basepath`. Surf to http://0.0.0.0:3400/ for a directory listing and take it from there.
 
+## Static site generation
+
+Draughtsman has experimental support for static site generation, using the `draughtsman build <src> <dest>` command, which works on individual files or directories. Expect this to fail sometimes, it's still very fresh.
+
 ## Daemonize and run on startup
 
 For additional convenience, you may want to deamonize the application and run it after login or startup just like your web server. The installation script can do this for you, using upstart on a Linux system and launchctl on OS X.
@@ -103,7 +107,7 @@ example, here's an alternative implementation of a CoffeeScript handler:
         match: /^(.*\.coffee)$/
         mime: 'application/javascript'
         compiler: (file, context, send) ->
-            exec 'coffee -cp #{req.file.path}', (error, stdout, stderr) ->
+            exec 'coffee -cp #{file.path}', (error, stdout, stderr) ->
                 if error
                     send error
                 else
