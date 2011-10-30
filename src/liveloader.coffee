@@ -21,12 +21,15 @@ absolutize = (host, base, location) ->
 
 exports.enable = (app) ->
     everyone = require("now").initialize(app, config)
-
+    
+    # TO FIX: may do weird things when multiple users are using draughtsman
+    # at the same time, and may keep watching files ad infinitum even if
+    # it doesn't have to.
     everyone.now.liveload = (host, path, files) ->
         # find the local files we need to watch for changes
         files = files.filter is_local
         files = files.map (file) -> absolutize(host, path, file)
-
+        
         files.forEach (file) ->
             fs.watchFile file, {persistent: true, interval:200}, (curr, prev) ->
                 if curr.mtime > prev.mtime
@@ -34,7 +37,7 @@ exports.enable = (app) ->
                     # we'll start watching these again after the reload
                     fs.unwatchFile(resource) for resource in files
                     everyone.now.reload()
-
+    
     app.get '*', (req, res, next) ->
         res.header 'Cache-Control', 'no-cache, must-revalidate'
 
@@ -47,7 +50,7 @@ exports.enable = (app) ->
                 )
 
             res.send html
-
+        
         next()
-
+    
     everyone

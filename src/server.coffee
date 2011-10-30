@@ -4,6 +4,7 @@ http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
+context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
 
@@ -15,19 +16,25 @@ app = express.createServer()
 liveloader.enable app
 proxy = new http_proxy.RoutingProxy()
 
-app.accepts = []
-
 ROOT = process.argv[2]
 
-app.get '*', (req, res, next) ->
-    file = ROOT + req.params[0]
+load_source = (file, callback) ->
     path.exists file, (exists) ->
         if exists
             fs.readFile file, 'utf8', (err, content) ->
-                req.file =
+                callback
                     path: file
                     content: content
-                next()
+        else
+            callback null
+
+app.get '*', (req, res, next) ->
+    file = ROOT + req.params[0]
+
+    load_source file, (source) ->
+        if source
+            req.file = source
+            next()
         else
             # try built-in resources (like jquery and underscore)
             resource = path.join listing.here("resources"), req.params[0]
@@ -37,11 +44,29 @@ app.get '*', (req, res, next) ->
                 else
                     res.send 404
 
-# this is where the magic happens and
-# all the handlers get loaded
+# transforms a generic handler/compiler into an express.js view
+register = (handler, app) ->
+    app.get handler.match, (req, res) ->
+        if handler.mime is 'text/html'
+            dispatch = 'live'
+            variables = context.find_template_variables req.file.path
+        else
+            dispatch = 'send'
+            variables = null
+    
+        res.contentType handler.mime
+        # this executes the compiler and sends res[dispatch]
+        # along as the callback, so we can easily support both
+        # synchronous and asynchronous handlers
+        handler.compiler req.file, variables, (output) ->
+            res[dispatch] output
+
+# this is where the magic happens and all the 
+# handlers get loaded and registered
 for handler in fs.readdirSync listing.here "handlers"
     handler_path = listing.here "handlers", handler.replace(".coffee", "")
-    require(handler_path)(app) 
+    handler = require(handler_path) 
+    register handler, app
 
 # directory listing
 

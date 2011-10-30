@@ -31,7 +31,7 @@ For additional convenience, you may want to deamonize the application and run it
 
 ## Advanced usage
 
-You can also use Draughtsman as a proxy: it'll process any file formats it knows about, and forward any other requests, like for PHP files, to a proper web server of your choosing.
+You can also use Draughtsman as a proxy: it'll process any file formats it knows about, and forward any other requests, like for PHP files, to a proper web server of your choosing. This saves you from having to switch back and forth and back and forth between URLs if you have need for a secondary web server like Apache.
 
 To use Draughtsman as a proxy, use the `--relay` argument, e.g. `draughtsman ./test/example --port 5000 --relay http://localhost:8888`.
 
@@ -62,47 +62,52 @@ For NGINX, try something like this:
 
 ## Adding handlers
 
-Draughtsman processes Jade templates, Django templates, HAML, CoffeeScript and Stylus out of the box. You can however easily add your own handler to `src/handlers`. The code should export a factory that outputs an express.js controller, written in either CoffeeScript (as in the examples below) or 
+Draughtsman processes Jade templates, Django templates, HAML, CoffeeScript and Stylus out of the box. You can however easily add your own handler to `src/handlers`. Handlers are little wrappers for (pre)compilers, written in either CoffeeScript (as in the examples below) or 
 JavaScript.
 
 A handler looks something like this: 
 
     stylus = require 'stylus'
-    
-    module.exports = (app) ->
-        app.accepts.push 'styl'
-        app.get /^(.*\.styl)$/, (req, res) ->
-            stylus(req.file.content).render (err, css) ->
+
+    module.exports =
+        match: /^(.*\.styl)$/
+        mime: 'text/css'
+        compiler: (file, context, send) ->
+            stylus(file.content).render (err, css) ->
                 if err
-                    res.send err
+                    send err
                 else
-                    res.contentType 'text/css'
-                    res.send css
+                    send css
 
-The requested file (in its plain/uncompiled state) will be available to you in `req.file.content`, 
-and the file path is accessible through `req.file.path`.
+The requested file (in its plain/uncompiled state) will be available to you in `file.content`, 
+and the file path is accessible through `file.path`.
 
-Handlers for template languages should preferably **use `res.live` instead of `res.send` to enable
-automatic reloading**.
+The second parameter, `context` includes data you should pass to your template as context.
+Of course, this only applies to template engines, not CSS preprocessors and the like.
+
+The third parameter, `send`, is a function you should call with the compiled code.
 
 Draughtsman automatically picks up any and all handlers in the `handlers` directory, though
 you'll need to run `cake build` on the app to recompile the code to include your handlers.
 
+The application will also inject some JavaScript code into all HTML output, to 
+make the autoreloader work.
+
 Draughtsman runs in node.js, but handlers' processing doesn't need to happen in node.js itself;
-you can easily create simple handlers that spawn a child process. For example, here's an 
-alternative implementation of a CoffeeScript handler: 
+you can easily create simple handlers that spawn a child process to do the heavy lifting. For
+example, here's an alternative implementation of a CoffeeScript handler: 
 
     exec = require('child_process').exec
 
-    module.exports = (app) ->
-        app.accepts.push 'coffee'
-        app.get /^(.*\.coffee)$/, (req, res) ->
+    module.exports =
+        match: /^(.*\.coffee)$/
+        mime: 'application/javascript'
+        compiler: (file, context, send) ->
             exec 'coffee -cp #{req.file.path}', (error, stdout, stderr) ->
                 if error
-                    res.send error
+                    send error
                 else
-                    res.contentType 'application/javascript'
-                    res.send stdout
+                    send stdout
 
 Using `exec` is particularly useful for compilers that are intended to be used through the
 shell, such as for the SASS stylesheet preprocessor, or when you need to write your own precompiler, 

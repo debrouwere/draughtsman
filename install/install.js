@@ -1,6 +1,7 @@
-var sys = require('sys');
-var fs = require('fs');
-var os = require('os').type();
+var sys  = require('sys');
+var fs   = require('fs');
+var path = require('path');
+var os   = require('os').type();
 var exec = require('child_process').exec;
 
 /* init */
@@ -20,6 +21,10 @@ if (os == 'Darwin') {
     var init_script = '/draughtsman.conf';
     var init_dir = "/etc/init";
 }
+
+/* build process */
+
+exec('mkdir lib; cake build', {'cwd': path.dirname(__dirname)});
 
 /* logic */
 
