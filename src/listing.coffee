@@ -1,27 +1,15 @@
 fs = require 'fs'
 path = require 'path'
 jade = require 'jade'
+handlers = require 'handlers'
 
 exports.here = here = (paths...) ->
     paths = [__dirname].concat paths
     path.join.apply this, paths
 
-endswith = (str, substr) ->
-    end = str.substring str.length-substr.length
-    return end is substr
-
-known = (file, types) ->
-    types = types.filter (type) ->
-        endswith(file, type)
-
-    if types.length
-        return types[0]
-    else
-        return no
-
 annotate_with_filetypes = (files, recognized_filetypes, root) ->
     files.map (file) ->
-        filetype = known file, recognized_filetypes
+        filetype = handlers.known file, recognized_filetypes
         filepath = file
         stat = fs.statSync path.join root, file
 

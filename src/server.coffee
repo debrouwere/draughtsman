@@ -4,13 +4,14 @@ http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
+handlers = require './handlers'
 context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
 
 # App
 
-exports.VERSION = '0.3.0'
+exports.VERSION = '0.5.0'
 
 app = express.createServer()
 liveloader.enable app
@@ -63,9 +64,7 @@ register = (handler, app) ->
 
 # this is where the magic happens and all the 
 # handlers get loaded and registered
-for handler in fs.readdirSync listing.here "handlers"
-    handler_path = listing.here "handlers", handler.replace(".coffee", "")
-    handler = require(handler_path) 
+for handler in handlers.handlers
     register handler, app
 
 # directory listing
