@@ -1,20 +1,20 @@
 fs = require 'fs'
 path = require 'path'
 jade = require 'jade'
-handlers = require 'handlers'
+handlers = require './handlers'
 
 exports.here = here = (paths...) ->
     paths = [__dirname].concat paths
     path.join.apply this, paths
 
-annotate_with_filetypes = (files, recognized_filetypes, root) ->
+annotate_with_filetypes = (files, root) ->
     files.map (file) ->
-        filetype = handlers.known file, recognized_filetypes
+        handler = handlers.known file
         filepath = file
         stat = fs.statSync path.join root, file
 
-        if filetype
-            type = filetype
+        if handler
+            type = handler.name
         else if stat.isDirectory()
             type = "folder"
             filepath += '/'
@@ -51,8 +51,8 @@ exports.controller = (req, res) ->
     else
         files = listing
 
-    listing = annotate_with_filetypes listing, req.app.accepts, req.file.path
-    files = annotate_with_filetypes files, req.app.accepts, req.file.path
+    listing = annotate_with_filetypes listing, req.file.path
+    files = annotate_with_filetypes files, req.file.path
 
     locals = 
         breadcrumbs: create_breadcrumbs req.params[0]

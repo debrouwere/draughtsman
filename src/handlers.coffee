@@ -16,5 +16,5 @@ for handler in fs.readdirSync listing.here "handlers"
 exports.known = (file) ->
     for handler in exports.handlers
         if handler.match.exec file
-            return yes
+            return handler
     return no
