@@ -4,6 +4,7 @@ http = require 'http'
 url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
+_ = require 'underscore'
 handlers = require './handlers'
 context = require './context'
 listing = require './listing'
@@ -37,13 +38,14 @@ app.get '*', (req, res, next) ->
             req.file = source
             next()
         else
+            req.file = no
             # try built-in resources (like jquery and underscore)
             resource = path.join listing.here("resources"), req.params[0]
             path.exists resource, (exists) ->
                 if exists
                     res.sendfile resource
                 else
-                    res.send 404
+                    next()
 
 # transforms a generic handler/compiler into an express.js view
 register = (handler, app) ->
@@ -71,6 +73,16 @@ for handler in handlers.handlers
 
 app.get /^(.*)\/$/, listing.controller
 
+# If the file loading routine that ran earlier found a file at this path, 
+# send that one, or otherwise (since static file loading only happens 
+# after we've checked all our custom filetype handlers and we are thus
+# at the end of the line) return a 404.
+app.get /^.+[^\/]$/, (req, res) ->
+    if req.file
+        res.sendfile req.file.path
+    else
+        res.send 404
+
 # start server and proxy server
 exports.listen = (port, relay_server) ->
     # init
@@ -82,14 +94,15 @@ exports.listen = (port, relay_server) ->
 
     # proxy server
     proxy_server = http.createServer (req, res) ->
-        if app.match.get(req.url).length > 2
+        # did our router match anything except for universal middleware?
+        match = _. any app.match(req.url), (route) ->
+            route.path isnt '*' 
+    
+        if match
             proxy.proxyRequest req, res, {host: 'localhost', port: port+1}
         else
             if destination?
                 proxy.proxyRequest req, res, {host: destination.hostname, port: destination.port}
-            else
-                app.get '*', (req, res) ->
-                    res.sendfile req.file.path
 
     # listen
     proxy_server.listen port
@@ -97,4 +110,4 @@ exports.listen = (port, relay_server) ->
 
     console.log "Draughtsman proxy v#{exports.VERSION} listening on port #{port}, server on #{port+1}"
     if relay_server?
-        console.log "Relaying file handling for unknown file types to #{relay_server}"
+        console.log "Relaying handling for unknown file types to #{relay_server}"

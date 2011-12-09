@@ -1,4 +1,4 @@
-var sys  = require('sys');
+var sys  = require('util');
 var fs   = require('fs');
 var path = require('path');
 var os   = require('os').type();

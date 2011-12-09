@@ -8,7 +8,7 @@
     "dependencies": {
         "coffee-script": "1.x", 
         "express": "2.x", 
-        "jade": "0.16.x", 
+        "jade": "0.17.x", 
         "stylus": "0.18.x",
         "yaml": "0.2.x",
         "haml": "0.4.x",
@@ -18,7 +18,8 @@
         "optimist": "0.2.x",
         "http-proxy": "0.7.x",
         "plate": "0.x",
-        "now": "0.7.x"
+        "now": "0.7.x",
+        "npm": "1.x"
     },
     "repository": {
         "type": "git", 
