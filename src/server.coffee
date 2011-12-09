@@ -77,7 +77,7 @@ app.get /^(.*)\/$/, listing.controller
 # send that one, or otherwise (since static file loading only happens 
 # after we've checked all our custom filetype handlers and we are thus
 # at the end of the line) return a 404.
-app.get /^.+[^\/]$/, (req, res) ->
+filehandler = (req, res) ->
     if req.file
         res.sendfile req.file.path
     else
@@ -91,6 +91,10 @@ exports.listen = (port, relay_server) ->
         destination = url.parse relay_server
     else
         destination = null
+        # if there's a relay server, like an Apache instance, that one will handle
+        # static file serving too, but if not, we let our app handle static file
+        # serving by adding in a new controller that does exactly that
+        app.get /^.+[^\/]$/, filehandler
 
     # proxy server
     proxy_server = http.createServer (req, res) ->
