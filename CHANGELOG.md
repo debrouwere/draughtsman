@@ -1,3 +1,8 @@
+## 0.6 (March 7, 2012)
+
+* Fixed a pernicious bug that would cause Draughtsman to hang or just plain not work sometimes, especially on the very first request.
+* Extracted file handling code into a separate library (Preprocessor) and adapted Draughtsman to Preprocessor's brand new API.
+
 ## 0.5 (October 27, 2011)
 
 * Experimental support for static site generation

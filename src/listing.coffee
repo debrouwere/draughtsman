@@ -1,7 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 jade = require 'jade'
-handlers = require './handlers'
+handlers = require 'preprocessor'
 
 exports.here = here = (paths...) ->
     paths = [__dirname].concat paths
@@ -9,9 +9,10 @@ exports.here = here = (paths...) ->
 
 annotate_with_filetypes = (files, root) ->
     files.map (file) ->
-        handler = handlers.known file
-        filepath = file
-        stat = fs.statSync path.join root, file
+        file = new handlers.File path: file
+        handler = handlers.findHandler file
+        filepath = file.path
+        stat = fs.statSync path.join root, file.path
 
         if handler
             type = handler.name
@@ -22,22 +23,22 @@ annotate_with_filetypes = (files, root) ->
             type = "file"
 
         return {
-            name: file.split("/").pop()
+            name: file.basename
             path: filepath
             type: type
             }
 
-create_breadcrumbs = (path) ->
+create_breadcrumbs = (uri) ->
     breadcrumbs = [{name: ".", path: "/"}]
-    path = path.split('/')
+    uri = uri.split('/')
 
     i = 0
-    while i < path.length
+    while i < uri.length
         i++
         continue unless path[i]
         breadcrumbs.push {
-            name: path[i]
-            path: path[0..i].join('/') + '/'
+            name: uri[i]
+            path: uri[0..i].join('/') + '/'
             }
 
     return breadcrumbs

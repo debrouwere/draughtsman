@@ -5,7 +5,7 @@ url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
 _ = require 'underscore'
-handlers = exports.handlers = require './handlers'
+handlers = exports.handlers = require 'preprocessor'
 context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
@@ -24,7 +24,7 @@ load_source = (file, callback) ->
     path.exists file, (exists) ->
         if exists
             fs.readFile file, 'utf8', (err, content) ->
-                callback
+                callback new handlers.File
                     path: file
                     content: content
         else
@@ -49,24 +49,26 @@ app.get '*', (req, res, next) ->
 
 # transforms a generic handler/compiler into an express.js view
 register = (handler, app) ->
-    app.get handler.match, (req, res) ->
-        if handler.mime is 'text/html'
-            dispatch = 'live'
-            variables = context.find_template_variables req.file.path
-        else
-            dispatch = 'send'
-            variables = null
-    
-        res.contentType handler.mime
-        # this executes the compiler and sends res[dispatch]
-        # along as the callback, so we can easily support both
-        # synchronous and asynchronous handlers
-        handler.compiler req.file, variables, (output) ->
-            res[dispatch] output
+    for extension in handler.extensions
+        match = new RegExp("^(.*\\.#{extension})$")
+        app.get match, (req, res) ->
+            if handler.mime.output is 'text/html'
+                dispatch = 'live'
+                variables = context.find_template_variables req.file.path
+            else
+                dispatch = 'send'
+                variables = null
+        
+            res.contentType handler.mime.output
+            # this executes the compiler and sends res[dispatch]
+            # along as the callback, so we can easily support both
+            # synchronous and asynchronous handlers
+            handler.compiler req.file, variables, (output) ->
+                res[dispatch] output
 
-# this is where the magic happens and all the 
-# handlers get loaded and registered
-for handler in handlers.handlers
+# this is where the magic happens and all the handlers 
+# we got from `preprocessor` get loaded and registered
+for name, handler of handlers.handlers
     register handler, app
 
 # directory listing
