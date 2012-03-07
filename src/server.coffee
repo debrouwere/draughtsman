@@ -51,20 +51,24 @@ app.get '*', (req, res, next) ->
 register = (handler, app) ->
     for extension in handler.extensions
         match = new RegExp("^(.*\\.#{extension})$")
-        app.get match, (req, res) ->
+        app.get match, (req, res) ->        
             if handler.mime.output is 'text/html'
                 dispatch = 'live'
                 variables = context.find_template_variables req.file.path
             else
                 dispatch = 'send'
                 variables = null
-        
-            res.contentType handler.mime.output
-            # this executes the compiler and sends res[dispatch]
-            # along as the callback, so we can easily support both
-            # synchronous and asynchronous handlers
-            handler.compiler req.file, variables, (output) ->
-                res[dispatch] output
+
+            if req.query.raw?
+                res.contentType handler.mime.source
+                res[dispatch] req.file.content
+            else
+                res.contentType handler.mime.output
+                # this executes the compiler and sends res[dispatch]
+                # along as the callback, so we can easily support both
+                # synchronous and asynchronous handlers
+                handler.compiler req.file, variables, (output) ->
+                    res[dispatch] output
 
 # this is where the magic happens and all the handlers 
 # we got from `preprocessor` get loaded and registered
