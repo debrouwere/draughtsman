@@ -16,7 +16,7 @@
         "underscore": "1.x",
         "findit": "0.1.x",
         "optimist": "0.2.x",
-        "http-proxy": "0.7.x",
+        "http-proxy": "0.8.x",
         "plate": "0.x",
         "now": "0.7.x",
         "npm": "1.x"

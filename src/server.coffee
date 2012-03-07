@@ -5,7 +5,7 @@ url = require 'url'
 express = require 'express'
 http_proxy = require 'http-proxy'
 _ = require 'underscore'
-handlers = require './handlers'
+handlers = exports.handlers = require './handlers'
 context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
@@ -99,7 +99,7 @@ exports.listen = (port, relay_server) ->
     # proxy server
     proxy_server = http.createServer (req, res) ->
         # did our router match anything except for universal middleware?
-        match = _. any app.match(req.url), (route) ->
+        match = _.any app.match(req.url), (route) ->
             route.path isnt '*' 
     
         if match
