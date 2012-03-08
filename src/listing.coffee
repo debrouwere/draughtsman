@@ -35,7 +35,7 @@ create_breadcrumbs = (uri) ->
     i = 0
     while i < uri.length
         i++
-        continue unless path[i]
+        continue unless uri[i]
         breadcrumbs.push {
             name: uri[i]
             path: uri[0..i].join('/') + '/'
