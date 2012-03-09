@@ -1,7 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 jade = require 'jade'
-handlers = require 'preprocessor'
+handlers = require 'tilt'
 
 exports.here = here = (paths...) ->
     paths = [__dirname].concat paths

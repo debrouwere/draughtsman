@@ -45,7 +45,7 @@ exports.generate = (source_file, destination) ->
 
                 variables = context.find_template_variables file.path
                 handler.compiler file, variables, (output) ->
-                    extension = '.' + (MIMETYPES[handler.mime] or 'txt')
+                    extension = '.' + (MIMETYPES[handler.mime.output] or 'txt')
                     destination = destination.replace /\.[a-zA-Z0-9]+$/, extension
                     mkdir path.dirname(destination), ->
                         console.log "#{source_file} ==> #{destination}"
