@@ -1,3 +1,12 @@
+## 0.7 (pending)
+
+* Airplane mode: uses the Mimeo library to provide a local cache of popular JavaScript libraries and other web-hosted files; also see `draughtsman where` on the command-line.
+* Extracted file handling code into a separate library (Tilt.js) that Draughtsman now depends on for preprocessing
+* Added a ?raw querystring flag, to bypass file preprocessing
+* Added integration with envv: Draughtsman can now strip out production-only code while you're prototyping
+* Removed static site generation; use Railgun instead
+* Separate installation and configuration, and allow for non-interactive configuration (allows us to do continuous integration using Travis CI)
+
 ## 0.6 (March 7, 2012)
 
 * Fixed a pernicious bug that would cause Draughtsman to hang or just plain not work sometimes, especially on the very first request.
