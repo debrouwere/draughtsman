@@ -6,6 +6,7 @@ express = require 'express'
 http_proxy = require 'http-proxy'
 _ = require 'underscore'
 handlers = exports.handlers = require 'tilt'
+mimeo = require 'mimeo'
 context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
@@ -117,6 +118,7 @@ exports.listen = (port, relay_server) ->
     # listen
     proxy_server.listen port
     app.listen port+1
+    #app.use '/vendor', mimeo.servers.libs
 
     console.log "Draughtsman proxy v#{exports.VERSION} listening on port #{port}, server on #{port+1}"
     if relay_server?

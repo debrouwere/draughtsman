@@ -1,5 +1,7 @@
 ## 0.7 (pending)
 
+This version introduces a new format for handlers as well as new, backwards-incompatible conventions for how to name data (context) files and how that data is available to your templates. The new format was designed to be by and large compatible with the way [Middleman](http://middlemanapp.com/guides/local-yaml-data) works with local YAML data.
+
 * Airplane mode: uses the Mimeo library to provide a local cache of popular JavaScript libraries and other web-hosted files; also see `draughtsman where` on the command-line.
 * Extracted file handling code into a separate library (Tilt.js) that Draughtsman now depends on for preprocessing
 * Added a ?raw querystring flag, to bypass file preprocessing
