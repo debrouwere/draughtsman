@@ -6,7 +6,7 @@ express = require 'express'
 http_proxy = require 'http-proxy'
 _ = require 'underscore'
 handlers = exports.handlers = require 'tilt'
-mimeo = require 'mimeo'
+stockpile = require 'stockpile'
 context = require './context'
 listing = require './listing'
 liveloader = require './liveloader'
@@ -40,13 +40,7 @@ app.get '*', (req, res, next) ->
             next()
         else
             req.file = no
-            # try built-in resources (like jquery and underscore)
-            resource = path.join listing.here("resources"), req.params[0]
-            path.exists resource, (exists) ->
-                if exists
-                    res.sendfile resource
-                else
-                    next()
+            next()
 
 # transforms a generic handler/compiler into an express.js view
 register = (handler, app) ->
@@ -80,6 +74,8 @@ for name, handler of handlers.handlers
 
 app.get /^(.*)\/$/, listing.controller
 
+app.get '/vendor/*', stockpile.middleware.libs('/vendor')
+
 # If the file loading routine that ran earlier found a file at this path, 
 # send that one, or otherwise (since static file loading only happens 
 # after we've checked all our custom filetype handlers and we are thus
@@ -107,8 +103,8 @@ exports.listen = (port, relay_server) ->
     proxy_server = http.createServer (req, res) ->
         # did our router match anything except for universal middleware?
         match = _.any app.match(req.url), (route) ->
-            route.path isnt '*' 
-    
+            route.path isnt '*'
+
         if match
             proxy.proxyRequest req, res, {host: 'localhost', port: port+1}
         else
@@ -118,7 +114,6 @@ exports.listen = (port, relay_server) ->
     # listen
     proxy_server.listen port
     app.listen port+1
-    #app.use '/vendor', mimeo.servers.libs
 
     console.log "Draughtsman proxy v#{exports.VERSION} listening on port #{port}, server on #{port+1}"
     if relay_server?

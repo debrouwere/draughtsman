@@ -17,6 +17,7 @@
         "http-proxy": "0.8.x",
         "now": "0.7.x",
         "tilt": "0.x",
+        "stockpile": "0.2.x",
         "npm": "1.x"
     },
     "devDependencies": {

@@ -1,7 +1,6 @@
 all:
 	coffee -co lib src
 	cp src/listing.jade lib
-	cp src/handlers/*.js lib/handlers
 	cp -r src/resources lib
 
 clean:
