@@ -7,7 +7,7 @@ http_proxy = require 'http-proxy'
 _ = require 'underscore'
 handlers = exports.handlers = require 'tilt'
 stockpile = require 'stockpile'
-context = require './context'
+espy = require 'espy'
 listing = require './listing'
 liveloader = require './liveloader'
 
@@ -47,23 +47,18 @@ register = (handler, app) ->
     for extension in handler.extensions
         match = new RegExp("^(.*\\.#{extension})$")
         app.get match, (req, res) ->        
-            if handler.mime.output is 'text/html'
-                dispatch = 'live'
-                variables = context.find_template_variables req.file.path
-            else
-                dispatch = 'send'
-                variables = null
-
             if req.query.raw?
                 res.contentType handler.mime.source
                 res[dispatch] req.file.content
             else
                 res.contentType handler.mime.output
-                # this executes the compiler and sends res[dispatch]
-                # along as the callback, so we can easily support both
-                # synchronous and asynchronous handlers
-                handler.compiler req.file, variables, (output) ->
-                    res[dispatch] output
+                if handler.mime.output is 'text/html'
+                    espy.findFor req.file.path, (context) ->
+                        handler.compiler req.file, context, (output) ->
+                            res.live output
+                else
+                    handler.compiler req.file, null, (output) ->
+                        res.send output
 
 # this is where the magic happens and all the handlers 
 # we got from `preprocessor` get loaded and registered
@@ -74,6 +69,8 @@ for name, handler of handlers.handlers
 
 app.get /^(.*)\/$/, listing.controller
 
+# TODO: maybe allow for a listing of /vendor that lists all
+# cached libraries?
 app.get '/vendor/*', stockpile.middleware.libs('/vendor')
 
 # If the file loading routine that ran earlier found a file at this path, 

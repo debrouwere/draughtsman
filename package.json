@@ -18,6 +18,7 @@
         "now": "0.7.x",
         "tilt": "0.x",
         "stockpile": "0.2.x",
+        "espy": "0.1.x",
         "npm": "1.x"
     },
     "devDependencies": {

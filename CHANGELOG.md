@@ -2,8 +2,9 @@
 
 This version introduces a new format for handlers as well as new, backwards-incompatible conventions for how to name data (context) files and how that data is available to your templates. The new format was designed to be by and large compatible with the way [Middleman](http://middlemanapp.com/guides/local-yaml-data) works with local YAML data.
 
-* Airplane mode: uses the Mimeo library to provide a local cache of popular JavaScript libraries and other web-hosted files; also see `draughtsman where` on the command-line.
+* Airplane mode: uses the Stockpile library to provide a local cache of popular JavaScript libraries and other web-hosted files; also see `draughtsman where` on the command-line.
 * Extracted file handling code into a separate library (Tilt.js) that Draughtsman now depends on for preprocessing
+* Extracted context finder into a separate, improved but backwards-incompatible library (espy) that Draughtsman now depends on
 * Added a ?raw querystring flag, to bypass file preprocessing
 * Added integration with envv: Draughtsman can now strip out production-only code while you're prototyping
 * Removed static site generation; use Railgun instead
