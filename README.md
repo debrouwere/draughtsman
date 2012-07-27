@@ -66,6 +66,6 @@ Draughtsman processes Jade templates, Django templates, HAML, CoffeeScript, LESS
 
 Find out more in the [Tilt.js documentation](https://github.com/stdbrouw/tilt.js/blob/master/README.md).
 
-## Adding resources
+## Load and cache popular JavaScript libraries
 
-Draughtsman comes with jQuery, underscore.js and Twitter Bootstrap out of the box, available under the root (e.g. `/jquery.js`) but you can add the libraries you use most as resources too: just add them to the `/src/resources` directory and do a `cake build` so they'll end up in `lib` too.
+TODO
