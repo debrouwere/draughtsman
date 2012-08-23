@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/stdbrouw/draughtsman.png)](http://travis-ci.org/stdbrouw/draughtsman)
 Draughtsman is an MIT-licensed tool for front-end developers who want a cutting-edge stack while prototyping (like Jade, Stylus and CoffeeScript for you node.js aficionados, HAML for Rails nuts and the Django template language for Pythonistas), but can't be bothered to run all sorts of command-line tools and who don't want to set up an entire project structure simply to test out a few layouts in their favorite CSS alternative.
 
 In addition to **precompilation** of .styl, .coffee, .dtl and .jade files, Draughtsman will also search for an eponymous .yml, .txt or .json file and use whatever it finds there to feed **dummy data** to your template.
