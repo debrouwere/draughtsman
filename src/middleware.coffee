@@ -40,7 +40,7 @@ module.exports =
             return next() unless req.file and req.handler
 
             if req.handler.mime.output is 'text/html'
-                espy.findFor req.file.path, (context) ->
+                espy.findFor req.file.path, 'fixtures', (context) ->
                     set = req.query.context
                     if set
                         req.context = context[set]
