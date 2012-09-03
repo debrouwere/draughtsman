@@ -1,0 +1,110 @@
+extends base
+block body
+  .row
+    .span3
+      ul.nav.nav-tabs.nav-stacked
+        li.active: a(href='#file', data-toggle='tab') File
+        li: a(href='#project', data-toggle='tab') Project
+        li: a(href='#resources', data-toggle='tab') Resources
+        li: a(href='#server', data-toggle='tab') Server
+        li: a(href='stdbrouw.github.com/draughtsman') Documentation &rarr;
+    .span9
+      .tab-content
+        #file.tab-pane.active
+          h1 File
+          ul.nav.nav-pills
+            li.active: a(href='#file-source', data-toggle='tab') Source
+            li: a(href='#file-context', data-toggle='tab') Context
+          .tab-content
+            #file-source.tab-pane.active
+              .row
+                .span3
+                  h4 compilation
+                  label.radio raw
+                    input(type='radio', name='compilation', value='raw')
+                  label.radio precompile
+                    input(type='radio', name='compilation', value='precompile')
+                  label.radio compile
+                    input(type='radio', name='compilation', value='compile', checked='checked')
+                .span3
+                  h4 environment
+                  label.radio production
+                    input(type='radio', name='environment', value='raw')
+                  label.radio development
+                    input(type='radio', name='environment', value='precompile', checked='checked')
+                .span3
+                  h4 context set
+                  each set, name in context.data
+                    label.radio= name
+                      input(type='radio', name='context', value=name)
+              .row
+                .span9
+                  h6 URL
+                  .row
+                    pre.span8
+                      | http://localhost:3400/debug/debug.jade?precompile&debug&context=three
+                    | &nbsp;
+                    a.btn.btn-large.btn-primary(href='#') &rarr;
+                  h6 SOURCE
+                  pre.pre-scrollable= source
+
+            #file-context.tab-pane
+              pre.pre-scrollable= contextString
+        #project.tab-pane
+          h1 Project
+          include listing
+        #resources.tab-pane
+          h1 Resources
+          h3 Airplane mode
+          p
+            | Draughtsman will automatically cache libraries as you request them.
+            | These libraries currently cached and available offline.
+          table.table
+            thead
+              tr
+                th Library
+                th version
+            tbody
+              tr
+                td jQuery
+                td 1.7.2
+              tr
+                td Underscore.js
+                td 0.7.9
+              tr
+                td Backbone.js
+                td 1.2.1
+          h3 Find libraries
+          p To find a library, use semver notation. New libraries are fetched from cdnjs.com.
+          input.search-query(type='search', placeholder='jquery@1.7.2')
+          |  
+          a.btn(href='#') search
+
+        #server.tab-pane
+          h1 Server
+          table.table
+            tbody
+              tr
+                td version
+                td v0.7
+              tr
+                td location
+                td /Libraries/node_modules
+              tr
+                td ports
+                td 3400, 3401
+              tr
+                td proxy
+                td n/a
+              tr
+                td root
+                td /Users/stdbrouw/Sites
+              tr
+                td index
+                td index.jade, index.haml, index.m
+              tr
+                td supported filetypes
+                td .jade, .styl, .less, .lessc
+              tr
+                td supported datatypes
+                td .json, .xml, .yml, .yaml

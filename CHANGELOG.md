@@ -1,14 +1,32 @@
 ## 0.7 (pending)
 
+0.7 will be the last version before 1.0 and it's a considerable overhaul.
+
 This version introduces a new format for handlers as well as new, backwards-incompatible conventions for how to name data (context) files and how that data is available to your templates. The new format was designed to be by and large compatible with the way [Middleman](http://middlemanapp.com/guides/local-yaml-data) works with local YAML data.
 
-* Airplane mode: uses the Stockpile library to provide a local cache of popular JavaScript libraries and other web-hosted files; also see `draughtsman where` on the command-line.
-* Extracted file handling code into a separate library (Tilt.js) that Draughtsman now depends on for preprocessing
+* Airplane mode: uses the Stockpile library to provide a local cache of popular JavaScript libraries and other web-hosted files
+* Removed static site generation; use Railgun instead
+* Changed to Tilt.js for precompilation. Tilt is the successor to the Preprocessor library
 * Extracted context finder into a separate, improved but backwards-incompatible library (espy) that Draughtsman now depends on
 * Added a ?raw querystring flag, to bypass file preprocessing
 * Added integration with envv: Draughtsman can now strip out production-only code while you're prototyping
-* Removed static site generation; use Railgun instead
-* Separate installation and configuration, and allow for non-interactive configuration (allows us to do continuous integration using Travis CI)
+
+* Added a ?precompile querystring flag, to precompile instead of compile e.g. a template
+* Improved error handling (read: any error handling at all, as there used to be none)
+  (for compilation errors)
+* Added an ?environment querystring flag, to control the environment setup for envv (or to bypass envv altogether with ?environment=0)
+* Added a user interface to the context finder to select between different context sets (also with the ?context querystring)
+* Separate installation and configuration, allow for non-interactive configuration (allows us to do continuous integration using Travis CI) and configuration using a config file (restart on change)
+* (optionally) load index.ext at /, with configurable priorities for the extensions
+* Fix bug in display of data files
+* Improved documentation
+
+        // instead of injecting the liveloader like we do now, 
+        // maybe allow people to manually specify it if they want it?
+        // (should combine liveloader.js and now.js)
+        script(src='/vendor/draughtsman/latest/live.js', data-environment='development')
+        // same deal for the context loader interface
+        script(src='/vendor/draughtsman/latest/context.js', data-environment='development')
 
 ## 0.6 (March 7, 2012)
 

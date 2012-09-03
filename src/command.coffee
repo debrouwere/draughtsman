@@ -1,7 +1,6 @@
 fs = require 'fs'
 optimist = require 'optimist'
 server = require './server'
-generator = require './generator'
 
 argv = require('optimist').argv
 

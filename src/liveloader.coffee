@@ -1,56 +1,53 @@
-fs = require 'fs'
-path = require 'path'
-ROOT = process.argv[2]
+###
+We're going to combine the raw nowjs/dist/now.js file with our liveloading code.
 
-# WebSockets aren't yet as fast as they could/should be in all browsers, 
-# so we're sticking to polling for now.
-config =
+window.now = nowInitialize "//localhost:#{port}", {}
+###
+
+###
+###
+###
+###
+
+fs = require 'fs'
+fs.path = require 'path'
+http = require 'http'
+watch = require 'watch'
+
+NOW =
+    lib: fs.readFileSync (fs.path.join __dirname, '../node_modules/now/dist/now.js'), 'utf8'
     socketio:
+        # web sockets can be unpredictably slow during page load, 
+        # so we're using more old school methods
         transports: ['xhr-polling', 'jsonp-polling']
 
-is_local = (location) ->
-    if location.indexOf('localhost') > -1
-        yes
-    else
-        no
+exports.enable = (app, root) ->
+    app.get '/vendor/draughtsman/latest/live.js', (req, res) ->
+        port = 3500
+        res.type 'text/javascript'
+        res.send """
+            #{NOW.lib}
+            window.now = nowInitialize("//localhost:#{port}", {})
+            now.reload = function(){window.location.reload(true);}
+            now.ready(function(){
+                now.watch(window.location.pathname);
+            });
+            """
 
-absolutize = (host, base, location) ->
-    dir = path.dirname base
-    if dir is '/' then dir = ''
-    location.replace("http://#{host}", "#{ROOT}#{dir}")
-
-exports.enable = (app) ->
-    everyone = require("now").initialize(app, config)
+    app.live = (port) ->
+        server = http.createServer app
+        everyone = (require "now").initialize server, {socketio: NOW.socketio}
     
-    # TO FIX: may do weird things when multiple users are using draughtsman
-    # at the same time, and may keep watching files ad infinitum even if
-    # it doesn't have to.
-    everyone.now.liveload = (host, path, files) ->
-        # find the local files we need to watch for changes
-        files = files.filter is_local
-        files = files.map (file) -> absolutize(host, path, file)
-        
-        files.forEach (file) ->
-            fs.watchFile file, {persistent: true, interval:200}, (curr, prev) ->
-                if curr.mtime > prev.mtime
-                    console.log "Reloading #{path} due to a change in #{file}"
-                    # we'll start watching these again after the reload
-                    fs.unwatchFile(resource) for resource in files
+        # there are a considerable number of edge cases in which it is impossible
+        # to know when we need to reload a file, e.g. whenever there's an 
+        # @import statement in a LESS file (which is invisible in the compiled
+        # CSS) so our reloader has to be a bit paranoid: if *any* file in 
+        # what we assume to be the project directory changes, then we'll reload
+        everyone.now.watch = (dir) ->
+            dir = fs.path.dirname fs.path.join root, dir
+            watch.watchTree dir, {persistent: yes, interval: 250}, (f, curr, prev) ->
+                if curr and everyone.now.reload
                     everyone.now.reload()
-    
-    app.get '*', (req, res, next) ->
-        res.header 'Cache-Control', 'no-cache, must-revalidate'
+            console.log "Watching #{dir} for changes and will live reload pages as needed."
 
-        res.live = (str) ->
-            html = str.replace(
-                "</body>", 
-                "<script src='http://#{req.headers.host}/nowjs/now.js'></script>
-                <script src='/liveloader.js'></script>
-                </body>"
-                )
-
-            res.send html
-        
-        next()
-    
-    everyone
+        server.listen port

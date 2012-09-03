@@ -1,7 +1,8 @@
 all:
 	coffee -co lib src
-	cp src/listing.jade lib
-	cp -r src/resources lib
+	cp -r src/client lib
+	cp -r src/vendor lib
+	cp -r src/views lib
 
 clean:
 	rm -rf lib
