@@ -30,6 +30,7 @@ module.exports =
                             path: path
                             content: content
                         req.handler = tilt.registry.getHandler req.file.extension
+                        req.compilerType = if req.query.precompile? then 'precompiler' else 'compiler'
                         next()
                 else
                     req.file = null
@@ -55,6 +56,12 @@ module.exports =
                 # also incorporate context picker: if there are context sets, 
                 # pick the first one or the one defined by ?context=
 
+    # the debugger does a little bit of trickery where it intercepts a 
+    # request, compiles the file that has been asked for, and then 
+    # forwards information from said compilation to a debug view
+    # instead; that's why we change `req.compilerType` and `req.file`
+    # after doing a first compilation. The final rendering will happen
+    # in a controller in `server.coffee`
     debugger: (viewPath) ->
         debugView = new tilt.File
             path: viewPath
@@ -63,7 +70,7 @@ module.exports =
         (req, res, next) ->
             return next() unless req.query.debug?
 
-            req.handler.compiler req.file, req.context, (err, output) ->
+            req.handler[req.compilerType] req.file, req.context, (err, output) ->
                 err = normalizeErrors err
 
                 req.context = {
@@ -72,6 +79,7 @@ module.exports =
                     contextString: JSON.stringify req.context, undefined, 4  
                     errors: err                              
                 }
+                req.compilerType = 'compiler'
                 req.file = debugView
                 next()
 

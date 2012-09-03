@@ -72,7 +72,7 @@ app.use middleware.fileServer()
 app.get '*', (req, res, next) ->
     return next() unless req.handler
 
-    req.handler.compiler req.file, req.context, (err, output) ->
+    req.handler[req.compilerType] req.file, req.context, (err, output) ->
         if err
             # we can't debug our debug view with our debug view
             # so we send a plain error instead; end users should
@@ -84,10 +84,13 @@ app.get '*', (req, res, next) ->
             else
                 url = req.url + '?debug'
 
-            console.log 'redirecting to ', url
             res.redirect url
         else
-            res.type req.handler.mime.output
+            if req.compilerType is 'precompiler'
+                res.type 'text/javascript'
+            else
+                res.type req.handler.mime.output
+            
             res.send output
 
 # directory listing
