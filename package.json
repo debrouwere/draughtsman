@@ -6,10 +6,7 @@
     "main": "./lib/server.js",
     "bin" : "./bin/draughtsman",
     "dependencies": {
-        "coffee-script": "1.x", 
         "express": "3.x", 
-        "yaml": "0.2.x",
-        "less": "1.x",
         "underscore": "1.x",
         "findit": "0.1.x",
         "watch": "0.5.x",

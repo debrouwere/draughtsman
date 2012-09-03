@@ -87,7 +87,7 @@ app.get '*', (req, res, next) ->
             res.redirect url
         else
             if req.compilerType is 'precompiler'
-                res.type 'text/javascript'
+                res.type req.handler.mime.precompiledOutput
             else
                 res.type req.handler.mime.output
             
