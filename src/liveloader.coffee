@@ -1,14 +1,3 @@
-###
-We're going to combine the raw nowjs/dist/now.js file with our liveloading code.
-
-window.now = nowInitialize "//localhost:#{port}", {}
-###
-
-###
-###
-###
-###
-
 fs = require 'fs'
 fs.path = require 'path'
 http = require 'http'
@@ -34,6 +23,8 @@ exports.enable = (app, root) ->
             });
             """
 
+    app.watchList = []
+
     app.live = (port) ->
         server = http.createServer app
         everyone = (require "now").initialize server, {socketio: NOW.socketio}
@@ -45,7 +36,10 @@ exports.enable = (app, root) ->
         # what we assume to be the project directory changes, then we'll reload
         everyone.now.watch = (dir) ->
             dir = fs.path.dirname fs.path.join root, dir
+            # no need to watch something we're already watching
+            return if (dir in app.watchList)
             watch.watchTree dir, {persistent: yes, interval: 250}, (f, curr, prev) ->
+                app.watchList.push dir
                 if curr and everyone.now.reload
                     everyone.now.reload()
             console.log "Watching #{dir} for changes and will live reload pages as needed."
