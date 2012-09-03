@@ -54,10 +54,12 @@ resolver.alias '/vendor/bootstrap/2.1.0', fs.path.here 'vendor/bootstrap/2.1.0'
 conditionalCache = (req) ->
     req.file or (req.path.indexOf '/vendor/draughtsman') is 0
 
+debug = middleware.debugger fs.path.here 'views/debug.jade'
+
 app.use middleware.loader resolver
 app.use '/vendor', middleware.fallback conditionalCache, stockpile.middleware.libs('')
 app.use middleware.contextFinder()
-app.use middleware.debugger fs.path.here 'views/debug.jade'
+app.use debug
 liveloader.enable app, ROOT
 app.use middleware.fileServer()
 
@@ -70,12 +72,22 @@ app.use middleware.fileServer()
 app.get '*', (req, res, next) ->
     return next() unless req.handler
 
-    res.type req.handler.mime.output
-    if req.handler.mime.output is 'text/html'
-        req.handler.compiler req.file, req.context, (output) ->
-            res.send output
-    else
-        req.handler.compiler req.file, null, (output) ->
+    req.handler.compiler req.file, req.context, (err, output) ->
+        if err
+            # we can't debug our debug view with our debug view
+            # so we send a plain error instead; end users should
+            # hopefully never see this
+            if req.query.debug then return res.send 500, err
+
+            if (req.url.indexOf '?') isnt -1
+                url = req.url + '&debug'
+            else
+                url = req.url + '?debug'
+
+            console.log 'redirecting to ', url
+            res.redirect url
+        else
+            res.type req.handler.mime.output
             res.send output
 
 # directory listing

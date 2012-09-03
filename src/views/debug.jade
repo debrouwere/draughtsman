@@ -34,9 +34,10 @@ block body
                     input(type='radio', name='environment', value='precompile', checked='checked')
                 .span3
                   h4 context set
-                  each set, name in context.data
-                    label.radio= name
-                      input(type='radio', name='context', value=name)
+                  if null
+                    each set, name in context.data
+                      label.radio= name
+                        input(type='radio', name='context', value=name)
               .row
                 .span9
                   h6 URL
@@ -45,6 +46,10 @@ block body
                       | http://localhost:3400/debug/debug.jade?precompile&debug&context=three
                     | &nbsp;
                     a.btn.btn-large.btn-primary(href='#') &rarr;
+                  if errors
+                    h6 ERRORS
+                    each error in errors
+                      pre= error.message
                   h6 SOURCE
                   pre.pre-scrollable= source
 

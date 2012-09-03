@@ -1,6 +1,13 @@
 fs = require 'fs'
 tilt = require 'tilt'
 espy = require 'espy'
+_ = require 'underscore'
+
+normalizeErrors = (err) ->
+    if err instanceof String then err = [new Error err]
+    if err instanceof Error then err = [err]
+
+    err
 
 module.exports =
     # decorator that allows us to conditionally invoke
@@ -56,13 +63,17 @@ module.exports =
         (req, res, next) ->
             return next() unless req.query.debug?
 
-            req.context = {
-                source: req.file.content
-                context: req.context
-                contextString: JSON.stringify req.context, undefined, 4                                
-            }
-            req.file = debugView
-            next()
+            req.handler.compiler req.file, req.context, (err, output) ->
+                err = normalizeErrors err
+
+                req.context = {
+                    source: req.file.content
+                    context: req.context
+                    contextString: JSON.stringify req.context, undefined, 4  
+                    errors: err                              
+                }
+                req.file = debugView
+                next()
 
     fileServer: (proxy) ->
         (req, res, next) ->
