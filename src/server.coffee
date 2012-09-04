@@ -10,11 +10,10 @@ handlers = exports.handlers = require 'tilt'
 stockpile = require 'stockpile'
 espy = require 'espy'
 http = require 'http'
-middleware = require './middleware'
-listing = require './listing'
-liveloader = require './liveloader'
-
-fs.path.here = (parts...) -> fs.path.join __dirname, parts...
+live = require './live'
+{route, middleware} = require './middleware'
+controllers = require './controllers'
+utils = require './utils'
 
 # App
 
@@ -27,26 +26,10 @@ app.set 'trust proxy', yes
 
 ROOT = process.argv[2]
 
-class Resolver
-    constructor: (@root) ->
-        @aliases = []
 
-    alias: (from, to) ->
-        @aliases.push {from, to}
-
-    resolve: (path) ->
-        alias = _.find @aliases, (map) ->
-            (path.indexOf map.from) is 0
-
-        if alias
-            path.replace alias.from, alias.to
-        else
-            fs.path.join @root, path
-
-resolver = new Resolver ROOT
-resolver.alias '/vendor/draughtsman/latest', fs.path.here 'client'
-resolver.alias '/vendor/bootstrap/2.1.0', fs.path.here 'vendor/bootstrap/2.1.0'
-
+resolver = new route.Resolver ROOT
+resolver.alias '/vendor/draughtsman/latest', utils.here 'client'
+resolver.alias '/vendor/bootstrap/2.1.0', utils.here 'vendor/bootstrap/2.1.0'
 
 
 # only look for /vendor libraries remotely or in the 
@@ -54,14 +37,19 @@ resolver.alias '/vendor/bootstrap/2.1.0', fs.path.here 'vendor/bootstrap/2.1.0'
 conditionalCache = (req) ->
     req.file or (req.path.indexOf '/vendor/draughtsman') is 0
 
-debug = middleware.debugger fs.path.here 'views/debug.jade'
+debug = middleware.debugger utils.here 'views/debug.jade'
 
+# middlewares
 app.use middleware.loader resolver
-app.use '/vendor', middleware.fallback conditionalCache, stockpile.middleware.libs('')
+app.use '/vendor', route.fallback conditionalCache, stockpile.middleware.libs('')
 app.use middleware.contextFinder()
 app.use debug
-liveloader.enable app, ROOT
+live.enable app, ROOT
 app.use middleware.fileServer()
+
+# controllers
+app.get /^(.*)\/$/, controllers.index
+app.get '*', controllers.file
 
 ###
 (req, res) ->
@@ -69,33 +57,7 @@ app.use middleware.fileServer()
     proxy.proxyRequest req, res, {host: destination.hostname, port: destination.port}
 ###
 
-app.get '*', (req, res, next) ->
-    return next() unless req.handler
-
-    req.handler[req.compilerType] req.file, req.context, (err, output) ->
-        if err
-            # we can't debug our debug view with our debug view
-            # so we send a plain error instead; end users should
-            # hopefully never see this
-            if req.query.debug then return res.send 500, err
-
-            if (req.url.indexOf '?') isnt -1
-                url = req.url + '&debug'
-            else
-                url = req.url + '?debug'
-
-            res.redirect url
-        else
-            if req.compilerType is 'precompiler'
-                res.type req.handler.mime.precompiledOutput
-            else
-                res.type req.handler.mime.output
-            
-            res.send output
-
-# directory listing
-#app.get /^(.*)\/$/, listing.controller
-
+# start app with file watching and live reloading (socket.io-based)
 exports.listen = (port) ->
     app.live port
 

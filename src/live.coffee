@@ -12,11 +12,10 @@ NOW =
 
 exports.enable = (app, root) ->
     app.get '/vendor/draughtsman/latest/live.js', (req, res) ->
-        port = 3500
         res.type 'text/javascript'
         res.send """
             #{NOW.lib}
-            window.now = nowInitialize("//localhost:#{port}", {})
+            window.now = nowInitialize("//#{req.headers.host}", {})
             now.reload = function(){window.location.reload(true);}
             now.ready(function(){
                 now.watch(window.location.pathname);
